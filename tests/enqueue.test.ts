@@ -30,6 +30,7 @@ interface EnqueueResponse {
     attempts?: number;
     duplicate?: boolean;
     error?: string;
+    message?: string;
     issues?: { path: string; message: string }[];
   };
 }
@@ -217,6 +218,66 @@ describe('POST /api/jobs', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.issues?.[0]?.message).toContain('conflicts');
+  });
+
+  it('returns the existing job when the same key is used with the same payload', async () => {
+    const key = 'test-same-payload-1';
+
+    const first = await post({ type: 'sales_report', payload: PAYLOAD, idempotencyKey: key });
+    const second = await post({ type: 'sales_report', payload: PAYLOAD, idempotencyKey: key });
+
+    expect(first.status).toBe(202);
+    expect(second.status).toBe(200);
+    expect(second.body.duplicate).toBe(true);
+    expect(second.body.id).toBe(first.body.id);
+    expect(second.body.status).toBe('pending');
+    expect(second.body.attempts).toBe(0);
+
+    expect(await countJobs(key)).toBe(1);
+  });
+
+  it('rejects a reused key that carries a different payload with 422', async () => {
+    const key = 'test-reused-key-1';
+    const otherPayload = { dateFrom: '2024-02-01', dateTo: '2024-03-31' };
+
+    const first = await post({ type: 'sales_report', payload: PAYLOAD, idempotencyKey: key });
+    expect(first.status).toBe(202);
+
+    const reused = await post({ type: 'sales_report', payload: otherPayload, idempotencyKey: key });
+
+    expect(reused.status).toBe(422);
+    expect(reused.body.error).toBe('idempotency_key_reused');
+    expect(reused.body.message).toBe('This key was already used with a different request');
+
+    // The stored job is untouched and no second row was created.
+    expect(await countJobs(key)).toBe(1);
+    const { rows } = await pool.query<{ payload: { dateFrom: string } }>(
+      'SELECT payload FROM jobs WHERE idempotency_key = $1',
+      [key],
+    );
+    expect(rows[0]?.payload.dateFrom).toBe(PAYLOAD.dateFrom);
+  });
+
+  it('ignores key order when comparing the stored payload', async () => {
+    const key = 'test-reused-key-2';
+
+    const first = await post({
+      type: 'sales_report',
+      payload: { dateFrom: '2024-01-01', dateTo: '2024-03-31' },
+      idempotencyKey: key,
+    });
+    expect(first.status).toBe(202);
+
+    // Same values, reversed key order in the JSON body.
+    const reordered = await post({
+      type: 'sales_report',
+      payload: { dateTo: '2024-03-31', dateFrom: '2024-01-01' },
+      idempotencyKey: key,
+    });
+
+    expect(reordered.status).toBe(200);
+    expect(reordered.body.duplicate).toBe(true);
+    expect(reordered.body.id).toBe(first.body.id);
   });
 });
 

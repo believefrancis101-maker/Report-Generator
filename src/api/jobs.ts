@@ -26,7 +26,15 @@ export function createJobsRouter(): Router {
       { maxAttempts: config.maxAttempts },
     );
 
-    if (outcome.duplicate) {
+    if (outcome.outcome === 'key_reused') {
+      res.status(422).json({
+        error: 'idempotency_key_reused',
+        message: 'This key was already used with a different request',
+      });
+      return;
+    }
+
+    if (outcome.outcome === 'duplicate') {
       res.status(200).json({
         id: outcome.id,
         status: outcome.status,

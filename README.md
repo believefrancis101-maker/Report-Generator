@@ -156,6 +156,18 @@ comes back, the existing job for that key is returned instead. Concurrent
 submits of the same key therefore collapse onto one row and one job id, no
 matter how many arrive at once.
 
+A key must always describe the **same request**. When the key already exists,
+the stored job's `type` and `payload` are compared with the submitted ones
+(payloads as canonical JSON with sorted keys, so key order is irrelevant). A
+mismatch is rejected:
+
+```json
+HTTP/1.1 422 Unprocessable Entity
+{ "error": "idempotency_key_reused", "message": "This key was already used with a different request" }
+```
+
+The stored job is left untouched in that case - no second row is created.
+
 **Errors** - a `400` with a per-field explanation:
 
 ```json
@@ -310,7 +322,8 @@ indexes in the migration SQL, and the enqueue endpoint.
 The endpoint tests run against a **real PostgreSQL database** - start it with
 `docker compose up -d` first. They submit the same idempotency key twice
 sequentially and then 20 times concurrently, and assert that exactly one row
-exists and that every response carries the same job id.
+exists and that every response carries the same job id. A key reused with a
+different payload is expected to fail with `422`.
 
 ## Status
 
