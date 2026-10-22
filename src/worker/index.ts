@@ -11,6 +11,7 @@ import type { HandlerContext, HandlerRegistry, JobHandler } from '../handlers/ty
 import { claimJob, type ClaimedJob } from './claim.js';
 import { completeJob } from './complete.js';
 import { failJob } from './fail.js';
+import { sweepStuckJobs } from './sweep.js';
 import {
   logClaimed,
   logFinished,
@@ -18,6 +19,7 @@ import {
   logJobFailed,
   logLine,
   logLostClaim,
+  logSweepRecovered,
 } from './log.js';
 
 /**
@@ -39,6 +41,11 @@ export interface StartWorkerOptions {
   pollIntervalMs: number;
   /** The backoff configuration for retries. */
   backoff: BackoffOptions;
+  /**
+   * Stuck-job recovery: the timeout that decides what "stuck" means and how
+   * often to look for stuck jobs. `false` switches the sweep off.
+   */
+  sweep: SweepOptions | false;
   /** TEST-ONLY fault settings. */
   faults?: FaultConfig;
   /**
@@ -61,10 +68,18 @@ export interface StartWorkerOptions {
 }
 
 export interface WorkerHandle {
-  /** Stops claiming and waits for the running jobs to finish. */
+  /** Stops claiming, the sweep and waits for the running jobs to finish. */
   stop(): Promise<void>;
   /** The number of jobs this worker is currently working on. */
   activeCount(): number;
+}
+
+/** How the sweep is scheduled. */
+export interface SweepOptions {
+  /** A job that has been running longer than this (ms) is stuck. */
+  stuckTimeoutMs: number;
+  /** How often (ms) the worker looks for stuck jobs. */
+  intervalMs: number;
 }
 
 export function startWorker(options: StartWorkerOptions): WorkerHandle {
@@ -240,11 +255,66 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
     );
   });
 
+  // --- Stuck-job recovery -------------------------------------------------
+  const sweepSettings = options.sweep;
+  let sweepTimer: ReturnType<typeof setInterval> | null = null;
+  /** The sweep that is currently running, so that ticks never overlap. */
+  let sweepInFlight: Promise<void> | null = null;
+
+  const runSweep = async (): Promise<void> => {
+    if (!sweepSettings) return;
+    try {
+      const recovered = await sweepStuckJobs(db, {
+        stuckTimeoutMs: sweepSettings.stuckTimeoutMs,
+      });
+      for (const job of recovered) {
+        logSweepRecovered(
+          options.workerId,
+          job.id,
+          job.status,
+          job.attempts,
+        );
+      }
+    } catch (error) {
+      // A failing sweep must never take the worker down: the jobs it did not
+      // recover are simply found again on the next tick.
+      logLine(
+        `[worker ${options.workerId}] sweep failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  };
+
+  const tickSweep = (): void => {
+    // Never overlap: a sweep that is still running means this tick is
+    // skipped. Several workers sweeping at the same time is safe - the
+    // second UPDATE matches no rows.
+    if (sweepInFlight) return;
+    sweepInFlight = runSweep().finally(() => {
+      sweepInFlight = null;
+    });
+  };
+
+  if (sweepSettings) {
+    // Once at startup, so a worker that starts after a crash recovers the
+    // jobs the dead worker left behind without waiting for the first tick.
+    tickSweep();
+    sweepTimer = setInterval(tickSweep, sweepSettings.intervalMs);
+  }
+
   const stop = async (): Promise<void> => {
     running = false;
+    // Stop the sweep timer; a sweep that is already running is awaited below.
+    if (sweepTimer) {
+      clearInterval(sweepTimer);
+      sweepTimer = null;
+    }
     // Interrupt the pending sleep so the loop exits right away.
     wake?.();
     await loopPromise;
+    // Let an in-flight sweep finish before the pool is closed.
+    await sweepInFlight;
     // Let the jobs that are still running finish.
     await Promise.allSettled([...inFlight]);
   };

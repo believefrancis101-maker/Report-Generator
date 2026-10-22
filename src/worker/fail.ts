@@ -10,7 +10,9 @@ import type { ClaimedJob } from './claim.js';
  * The claim picks up 'pending' and 'failed' jobs, but never a 'dead' one.
  *
  * The statement is fenced exactly like the completion: it only applies while
- * this worker still owns the claim.
+ * this worker still owns the claim. When it does not, the worker's execution
+ * record is closed as 'crashed' - but only if it is still open, so the
+ * sweep's own 'crashed' mark is never overwritten.
  */
 
 /** Records the failure and either schedules a retry or kills the job. */
@@ -50,6 +52,7 @@ const LOST_RUN_SQL = `
 UPDATE "job_runs"
 SET "finished_at" = now(), "outcome" = 'crashed'
 WHERE "id" = $1
+  AND "outcome" IS NULL
 `;
 
 /** The outcome of a failed attempt. */

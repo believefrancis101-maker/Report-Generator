@@ -65,7 +65,8 @@ report-generator/
 │   │   ├── fail.ts           # Failed attempt -> retry or dead
 │   │   ├── handler.ts        # Stub handler (tests only)
 │   │   ├── index.ts          # The worker loop (startWorker)
-│   │   └── log.ts            # The log formats
+│   │   ├── log.ts            # The log formats
+│   │   └── sweep.ts          # Stuck-job recovery (one atomic statement)
 │   ├── server.ts             # API entrypoint  -> npm run dev:api
 │   ├── sleep.ts              # Sleep helper
 │   ├── worker.ts             # Worker entrypoint -> npm run dev:worker
@@ -76,6 +77,7 @@ report-generator/
 │   ├── enqueue.test.ts       # API tests against the real database
 │   ├── migration.test.ts     # Guards the hand-written CHECK constraints
 │   ├── salesReport.test.ts   # Handler tests: totals, idempotency, crash
+│   ├── sweep.test.ts         # Stuck-job recovery, end to end
 │   └── worker.test.ts        # Worker tests against the real database
 ├── .env.example              # Copy to .env (never committed)
 ├── .gitignore
@@ -248,6 +250,52 @@ would have exactly that race window. Both statements share one transaction:
 a crash between them cannot leave a `processing` job without its `job_runs`
 row.
 
+**Stuck jobs are recovered by a sweep** - if a worker dies between claiming a
+job and recording an outcome, the job would stay `processing` forever. Every
+worker sweeps once at startup and then every `SWEEP_INTERVAL_MS`: one
+statement puts the abandoned job back into the queue and closes its execution
+record in the same atomic step (two data-modifying CTEs):
+
+```sql
+WITH recovered AS (
+    UPDATE "jobs" SET
+        "attempts" = "attempts" + 1,
+        "status"  = CASE WHEN "attempts" + 1 >= "max_attempts" THEN 'dead' ELSE 'pending' END,
+        "last_error" = 'Recovered by sweep: stuck in processing for more than ' || $1 || 'ms',
+        "run_at"  = now(),
+        "finished_at" = CASE WHEN "attempts" + 1 >= "max_attempts" THEN now() ELSE NULL END,
+        "updated_at"  = now()
+    WHERE "status" = 'processing'
+      AND "started_at" < now() - ($1 * interval '1 millisecond')
+    RETURNING "id", "status", "attempts"
+),
+closed AS (
+    UPDATE "job_runs" r SET
+        "finished_at" = now(),
+        "outcome"     = 'crashed',
+        "error"       = 'Abandoned: worker did not finish; recovered by sweep'
+    FROM recovered
+    WHERE r."job_id" = recovered."id" AND r."outcome" IS NULL
+    RETURNING r."id"
+)
+SELECT "id", "status", "attempts" FROM recovered
+```
+
+`STUCK_TIMEOUT_MS` (`$1`) is the only input, and `now()` is the database
+clock. The recovery counts as an attempt, so a job that keeps killing its
+worker ends up `dead` instead of being recovered forever. The sweep and a
+worker finishing the same job are serialized by the row lock: if the sweep
+wins, the worker's fenced `UPDATE` (`status = 'processing' AND started_at =
+<its claim>`) matches nothing, and the "lost claim" path only closes its run
+row when it is still open - the sweep's mark is never overwritten. A worker
+that is merely slow can therefore still run the job twice, which is exactly
+why the handlers are idempotent. The sweep never overlaps with itself: a tick
+that arrives while the previous sweep is running is skipped.
+
+```
+2026-10-22T16:59:43.841Z [worker host-31712] sweep recovered d2ff6491-5fab-46d9-8dad-238f4e36caa5 -> pending (attempts=1)
+```
+
 **Completion is fenced** - the claim hands back the `started_at` it wrote, and
 the completion only applies while that token still matches:
 
@@ -377,6 +425,12 @@ when the environment is invalid. The database URL is never logged.
 > **TEST-ONLY settings** (`FAIL_RATE`, `CRASH_AFTER_WORK`, `WORK_DELAY_MS`) exist
 > to exercise failure paths in automated tests. They are **not production
 > controls** and must never be enabled in a deployed environment.
+
+> **`STUCK_TIMEOUT_MS` must be comfortably longer than the slowest legitimate
+> job** (a report currently takes roughly 2-6 s on the 500k-row seed). If it is
+> too short, healthy jobs are recovered while they are still running: they are
+> counted as a failed attempt and the work happens twice. Set it to several
+> times the worst-case job duration.
 
 Numeric variables are parsed and range-checked; non-numeric, non-finite,
 out-of-range and non-integer values are rejected instead of being coerced.

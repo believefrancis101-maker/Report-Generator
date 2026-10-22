@@ -60,3 +60,15 @@ export function logJobDead(
     `[worker ${workerId}] job ${jobId} is DEAD after ${attempts} attempts: ${message}`,
   );
 }
+
+/** `[worker <id>] sweep recovered <jobId> -> <status> (attempts=<n>)` */
+export function logSweepRecovered(
+  workerId: string,
+  jobId: string,
+  status: string,
+  attempts: number,
+): void {
+  logLine(
+    `[worker ${workerId}] sweep recovered ${jobId} -> ${status} (attempts=${attempts})`,
+  );
+}

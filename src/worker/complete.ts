@@ -12,9 +12,11 @@ import type { ClaimedJob } from './claim.js';
  *
  * If the job was recovered by the sweeper and handed to somebody else in the
  * meantime, its `started_at` no longer matches and the UPDATE affects zero
- * rows. The worker then reports that it lost the claim and marks its
- * execution record as 'crashed'. Without this fence a slow worker could
- * overwrite the result of the worker that actually took the job over.
+ * rows. The worker then reports that it lost the claim and closes its
+ * execution record as 'crashed' - but only if that record is still open: when
+ * the sweep already closed it, the sweep's mark is the one that stays.
+ * Without this fence a slow worker could overwrite the result of the worker
+ * that actually took the job over.
  */
 
 /** Marks the job as succeeded - only while the claim is still valid. */
@@ -42,6 +44,7 @@ UPDATE "job_runs"
 SET "finished_at" = now(),
     "outcome" = 'crashed'
 WHERE "id" = $1
+  AND "outcome" IS NULL
 `;
 
 /**

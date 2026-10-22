@@ -268,6 +268,7 @@ describe('salesReport handler', () => {
         throw new CrashError('crashed after the work was saved (TEST-ONLY)');
       },
       aggregate,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -304,6 +305,7 @@ describe('salesReport handler', () => {
       pollIntervalMs: 20,
       backoff: { baseMs: 50, maxMs: 500 },
       aggregate,
+      sweep: false,
       db: workerPool,
     });
     running.push(secondWorker);
@@ -344,6 +346,7 @@ describe('salesReport handler', () => {
       backoff: { baseMs: 50, maxMs: 500 },
       faults: { workDelayMs: 0, failRate: 1, crashAfterWork: false },
       aggregate,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -381,6 +384,7 @@ describe('salesReport handler', () => {
       pollIntervalMs: 20,
       backoff: { baseMs: 50, maxMs: 500 },
       aggregate,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);

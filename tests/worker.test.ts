@@ -152,6 +152,7 @@ describe('worker loop', () => {
       pollIntervalMs: 50,
       handler: createStubHandler(300),
       backoff: BACKOFF,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -200,6 +201,7 @@ describe('worker loop', () => {
       pollIntervalMs: 20,
       handler: createStubHandler(40),
       backoff: BACKOFF,
+      sweep: false,
       db: workerPool,
     });
     const workerB = startWorker({
@@ -208,6 +210,7 @@ describe('worker loop', () => {
       pollIntervalMs: 20,
       handler: createStubHandler(40),
       backoff: BACKOFF,
+      sweep: false,
       db: workerPool,
     });
     running.push(workerA, workerB);
@@ -248,6 +251,7 @@ describe('worker loop', () => {
       pollIntervalMs: 50,
       handler: createStubHandler(700),
       backoff: BACKOFF,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -285,6 +289,7 @@ describe('worker loop', () => {
       pollIntervalMs: 50,
       handler: createStubHandler(0),
       backoff: BACKOFF,
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -319,6 +324,7 @@ describe('retries and the dead state', () => {
       pollIntervalMs: 20,
       handler: createStubHandler(0, 1),
       backoff: { baseMs: 100, maxMs: 10_000 },
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -386,6 +392,7 @@ describe('retries and the dead state', () => {
       pollIntervalMs: 20,
       handler,
       backoff: { baseMs: 50, maxMs: 1_000 },
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -423,6 +430,7 @@ describe('retries and the dead state', () => {
       pollIntervalMs: 20,
       handler,
       backoff: { baseMs: 100, maxMs: 10_000 },
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);
@@ -457,6 +465,7 @@ describe('retries and the dead state', () => {
       pollIntervalMs: 20,
       handler: createStubHandler(0, 1),
       backoff: { baseMs: 50, maxMs: 500 },
+      sweep: false,
       db: workerPool,
     });
     running.push(worker);

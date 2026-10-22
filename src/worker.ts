@@ -25,6 +25,12 @@ async function main(): Promise<void> {
       baseMs: config.backoffBaseMs,
       maxMs: config.backoffMaxMs,
     },
+    // Stuck-job recovery. STUCK_TIMEOUT_MS must stay comfortably above the
+    // duration of the slowest legitimate job.
+    sweep: {
+      stuckTimeoutMs: config.stuckTimeoutMs,
+      intervalMs: config.sweepIntervalMs,
+    },
     // TEST-ONLY fault injection.
     faults: {
       workDelayMs: config.workDelayMs,
@@ -34,7 +40,7 @@ async function main(): Promise<void> {
   });
 
   logLine(
-    `[worker ${config.workerId}] started | concurrency=${config.concurrency} pollIntervalMs=${config.pollIntervalMs}`,
+    `[worker ${config.workerId}] started | concurrency=${config.concurrency} pollIntervalMs=${config.pollIntervalMs} stuckTimeoutMs=${config.stuckTimeoutMs} sweepIntervalMs=${config.sweepIntervalMs}`,
   );
 
   let shuttingDown = false;
