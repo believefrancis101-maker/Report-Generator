@@ -85,7 +85,7 @@ export function renderJobsPage(options: JobsPageOptions): string {
         <tr>
           <th>Job id</th>
           <th>Status</th>
-          <th>Attempts</th>
+          <th>Failed attempts</th>
           <th>run_at</th>
           <th>started_at</th>
           <th>finished_at</th>

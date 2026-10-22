@@ -153,6 +153,8 @@ describe('GET /jobs', () => {
     // Both fixtures are visible in the unfiltered table.
     expect(html).toContain(pending);
     expect(html).toContain(dead);
+    // The column counts failed/abandoned runs, not claims - say so.
+    expect(html).toContain('<th>Failed attempts</th>');
   });
 
   it('filters the table by status and keeps the other statuses out', async () => {
