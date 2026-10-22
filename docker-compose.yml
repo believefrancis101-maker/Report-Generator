@@ -1,0 +1,30 @@
+# Local development database for report-generator.
+# PostgreSQL only - no queue broker is required, jobs live in Postgres.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: report-generator-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-report}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-report_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-report_generator}
+    ports:
+      - "${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - report-generator-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-report} -d ${POSTGRES_DB:-report_generator}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  report-generator-pgdata:
+    name: report-generator-pgdata

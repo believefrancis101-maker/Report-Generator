@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Generated Prisma client
+src/generated/
+
+# Environment files (real secrets) - only .env.example is tracked
+.env
+.env.*
+!.env.example
+
+# Test / tooling output
+coverage/
+.vitest/
+*.log
+npm-debug.log*
+
+# Local database artefacts
+prisma/dev.db
+prisma/dev.db-journal
+*.sqlite
+*.sqlite3
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,16 @@
+// Prisma schema - Stage 1 scaffold.
+//
+// The job model (and its status/attempt bookkeeping) is intentionally NOT
+// defined yet: it is introduced in a later stage together with the queue
+// implementation. This file only wires up the generator and the datasource.
+//
+// The datasource URL is provided by prisma.config.ts (from DATABASE_URL).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
