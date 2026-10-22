@@ -21,11 +21,15 @@ async function main(): Promise<void> {
     workerId: config.workerId,
     concurrency: config.concurrency,
     pollIntervalMs: config.pollIntervalMs,
-    workDelayMs: config.workDelayMs,
-    failRate: config.failRate,
     backoff: {
       baseMs: config.backoffBaseMs,
       maxMs: config.backoffMaxMs,
+    },
+    // TEST-ONLY fault injection.
+    faults: {
+      workDelayMs: config.workDelayMs,
+      failRate: config.failRate,
+      crashAfterWork: config.crashAfterWork,
     },
   });
 

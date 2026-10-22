@@ -4,7 +4,7 @@ import { loadConfig } from '../src/config.js';
 import { claimJob } from '../src/worker/claim.js';
 import { completeJob } from '../src/worker/complete.js';
 import { failJob } from '../src/worker/fail.js';
-import type { JobHandler } from '../src/worker/handler.js';
+import { createStubHandler, type JobHandler } from '../src/worker/handler.js';
 import { startWorker, type WorkerHandle } from '../src/worker/index.js';
 
 /**
@@ -150,7 +150,7 @@ describe('worker loop', () => {
       workerId: 'worker-concurrency',
       concurrency: 3,
       pollIntervalMs: 50,
-      workDelayMs: 300,
+      handler: createStubHandler(300),
       backoff: BACKOFF,
       db: workerPool,
     });
@@ -198,7 +198,7 @@ describe('worker loop', () => {
       workerId: 'worker-a',
       concurrency: 3,
       pollIntervalMs: 20,
-      workDelayMs: 40,
+      handler: createStubHandler(40),
       backoff: BACKOFF,
       db: workerPool,
     });
@@ -206,7 +206,7 @@ describe('worker loop', () => {
       workerId: 'worker-b',
       concurrency: 3,
       pollIntervalMs: 20,
-      workDelayMs: 40,
+      handler: createStubHandler(40),
       backoff: BACKOFF,
       db: workerPool,
     });
@@ -246,7 +246,7 @@ describe('worker loop', () => {
       workerId: 'worker-shutdown',
       concurrency: 2,
       pollIntervalMs: 50,
-      workDelayMs: 700,
+      handler: createStubHandler(700),
       backoff: BACKOFF,
       db: workerPool,
     });
@@ -283,7 +283,7 @@ describe('worker loop', () => {
       workerId: 'worker-future',
       concurrency: 3,
       pollIntervalMs: 50,
-      workDelayMs: 0,
+      handler: createStubHandler(0),
       backoff: BACKOFF,
       db: workerPool,
     });
@@ -317,8 +317,7 @@ describe('retries and the dead state', () => {
       workerId: 'worker-retry',
       concurrency: 1,
       pollIntervalMs: 20,
-      workDelayMs: 0,
-      failRate: 1,
+      handler: createStubHandler(0, 1),
       backoff: { baseMs: 100, maxMs: 10_000 },
       db: workerPool,
     });
@@ -385,7 +384,6 @@ describe('retries and the dead state', () => {
       workerId: 'worker-flaky',
       concurrency: 1,
       pollIntervalMs: 20,
-      workDelayMs: 0,
       handler,
       backoff: { baseMs: 50, maxMs: 1_000 },
       db: workerPool,
@@ -423,7 +421,6 @@ describe('retries and the dead state', () => {
       workerId: 'worker-last-error',
       concurrency: 1,
       pollIntervalMs: 20,
-      workDelayMs: 0,
       handler,
       backoff: { baseMs: 100, maxMs: 10_000 },
       db: workerPool,
@@ -458,8 +455,7 @@ describe('retries and the dead state', () => {
       workerId: 'worker-leak',
       concurrency: 2,
       pollIntervalMs: 20,
-      workDelayMs: 0,
-      failRate: 1,
+      handler: createStubHandler(0, 1),
       backoff: { baseMs: 50, maxMs: 500 },
       db: workerPool,
     });

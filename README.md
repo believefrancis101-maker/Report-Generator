@@ -52,14 +52,22 @@ report-generator/
 │   │   ├── enqueue.ts        # Idempotent insert (ON CONFLICT DO NOTHING)
 │   │   ├── idempotency.ts    # Canonical JSON + SHA-256 key derivation
 │   │   └── validation.ts     # Zod request validation
+│   ├── faults.ts             # TEST-ONLY fault injection (delay, fail rate, crash)
+│   ├── handlers/
+│   │   ├── aggregate.ts      # The SQL analysis over sales_orders
+│   │   ├── index.ts          # Job type -> handler registry
+│   │   ├── pdf.ts            # pdfkit rendering
+│   │   ├── salesReport.ts    # The idempotent sales_report handler
+│   │   └── types.ts          # JobHandler / HandlerContext
 │   ├── worker/
 │   │   ├── claim.ts          # Atomic claim (FOR UPDATE SKIP LOCKED)
 │   │   ├── complete.ts       # Completion with fencing
 │   │   ├── fail.ts           # Failed attempt -> retry or dead
-│   │   ├── handler.ts        # Job handler (stub for now)
+│   │   ├── handler.ts        # Stub handler (tests only)
 │   │   ├── index.ts          # The worker loop (startWorker)
 │   │   └── log.ts            # The log formats
 │   ├── server.ts             # API entrypoint  -> npm run dev:api
+│   ├── sleep.ts              # Sleep helper
 │   ├── worker.ts             # Worker entrypoint -> npm run dev:worker
 │   └── generated/            # Prisma client (generated, git-ignored)
 ├── tests/
@@ -67,6 +75,7 @@ report-generator/
 │   ├── config.test.ts        # Configuration validation tests
 │   ├── enqueue.test.ts       # API tests against the real database
 │   ├── migration.test.ts     # Guards the hand-written CHECK constraints
+│   ├── salesReport.test.ts   # Handler tests: totals, idempotency, crash
 │   └── worker.test.ts        # Worker tests against the real database
 ├── .env.example              # Copy to .env (never committed)
 ├── .gitignore
@@ -296,6 +305,48 @@ dependency in a thundering herd. The delay is computed in JavaScript and
 handed to the database as a number of milliseconds
 (`now() + ($4 * interval '1 millisecond')`), so the schedule is based on the
 **database clock** and workers on different machines stay consistent.
+
+## Report generation
+
+A `sales_report` job is handled by
+[`src/handlers/salesReport.ts`](src/handlers/salesReport.ts); the worker looks
+the handler up by job type in [`src/handlers/index.ts`](src/handlers/index.ts).
+An unknown type throws and goes through the usual retry/dead path, so a typo in
+a producer can never be silently ignored.
+
+The handler is **idempotent**, and it proves it in the cheapest possible way:
+
+1. `SELECT 1 FROM reports WHERE job_id = $1` - if the report already exists
+   the handler logs `report for <jobId> already exists, skipping` and returns
+   without aggregating or rendering anything.
+2. The analysis runs over `sales_orders` for the requested period (inclusive,
+   in UTC): revenue and orders by category and month, the top 10 customers with
+   their rank, and month-over-month growth (SQL `lag()`) with each category's
+   share of its month (a window function). The aggregation is a separate
+   function so the tests can spy on it.
+3. The PDF is rendered with `pdfkit` - title, job id, parameters, totals, the
+   category-by-month table (it paginates), the top customers and the growth
+   table. Amounts are stored in minor units and printed as `NGN 1,234.56`
+   (the text is used because the built-in PDF fonts have no naira glyph).
+4. `INSERT INTO reports (job_id, summary, pdf) ... ON CONFLICT (job_id) DO
+   NOTHING` - the UNIQUE constraint on `job_id` is what makes concurrent
+   attempts safe.
+
+On the 500,000-row seed the aggregation takes **~2.7 s**, which is why the work
+does not happen in the request: the API only enqueues.
+
+**The crash that proves it.** With `CRASH_AFTER_WORK=true` the worker is killed
+after the report row exists but before the job is marked `succeeded`. The job
+stays `processing` - exactly the state the recovery path has to deal with. Once
+it is claimable again, the next attempt finds the report and skips the work:
+one report, one aggregation. That scenario is a test in
+[`tests/salesReport.test.ts`](tests/salesReport.test.ts).
+
+```
+[handler] aggregation for job 9814fb98-… took 2670ms (250 category-months, 10 top customers, 25 months)
+[handler] report for 9814fb98-… saved (23223 bytes, 2670ms aggregation)
+[handler] report for 9814fb98-… already exists, skipping
+```
 
 **Shutdown** - on `SIGTERM`/`SIGINT` the worker stops claiming, waits for the
 running jobs to finish, closes the pool and exits `0`. `SIGKILL` skips that

@@ -1,10 +1,16 @@
 import type { Pool } from 'pg';
 import { pool as sharedPool } from '../db.js';
 import { backoffDelayMs, type BackoffOptions } from '../backoff.js';
+import { applyFaults, crashAfterWork, CrashError, type ApplyFaults, type FaultConfig } from '../faults.js';
+import { handlers as defaultRegistry, resolveHandler } from '../handlers/index.js';
+import {
+  aggregateSalesReport,
+  type AggregateFunction,
+} from '../handlers/aggregate.js';
+import type { HandlerContext, HandlerRegistry, JobHandler } from '../handlers/types.js';
 import { claimJob, type ClaimedJob } from './claim.js';
 import { completeJob } from './complete.js';
 import { failJob } from './fail.js';
-import { createStubHandler, type JobHandler } from './handler.js';
 import {
   logClaimed,
   logFinished,
@@ -31,15 +37,24 @@ export interface StartWorkerOptions {
   concurrency: number;
   /** How long to wait before polling again when there is nothing to do. */
   pollIntervalMs: number;
-  /** Artificial delay per job (used by the stub handler). */
-  workDelayMs?: number;
-  /** Probability that the stub handler fails on purpose (0..1). */
-  failRate?: number;
   /** The backoff configuration for retries. */
   backoff: BackoffOptions;
-  /** Performs the work of a job. Defaults to the stub handler. */
+  /** TEST-ONLY fault settings. */
+  faults?: FaultConfig;
+  /**
+   * Replaces the handler of every job. Only the tests use this - the worker
+   * normally looks the handler up in the registry.
+   */
   handler?: JobHandler;
-  /** Source of randomness for the backoff jitter and the stub handler. */
+  /** The registry that maps a job type to its handler. */
+  handlers?: HandlerRegistry;
+  /** The aggregation used by the sales report handler. */
+  aggregate?: AggregateFunction;
+  /** TEST-ONLY fault injection applied at the start of a handler. */
+  applyFaults?: ApplyFaults;
+  /** TEST-ONLY crash after the work was saved. */
+  crashAfterWork?: () => void;
+  /** Source of randomness for the backoff jitter and the fault injection. */
   random?: () => number;
   /** Connection pool to use. Defaults to the shared pool. */
   db?: Pool;
@@ -55,9 +70,22 @@ export interface WorkerHandle {
 export function startWorker(options: StartWorkerOptions): WorkerHandle {
   const db = options.db ?? sharedPool;
   const random = options.random ?? Math.random;
-  const handler =
-    options.handler ??
-    createStubHandler(options.workDelayMs ?? 0, options.failRate ?? 0, random);
+  const registry = options.handlers ?? defaultRegistry;
+  const faults: FaultConfig = options.faults ?? {
+    workDelayMs: 0,
+    failRate: 0,
+    crashAfterWork: false,
+  };
+
+  const context: HandlerContext = {
+    db,
+    workerId: options.workerId,
+    random,
+    faults,
+    aggregate: options.aggregate ?? aggregateSalesReport,
+    applyFaults: options.applyFaults ?? applyFaults,
+    crashAfterWork: options.crashAfterWork ?? crashAfterWork,
+  };
 
   let running = true;
   /** Jobs this process is currently working on. */
@@ -78,6 +106,19 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
         resolve();
       };
     });
+
+  /**
+   * Finds the handler for a job. An unknown job type throws - the job then
+   * goes through the normal retry/dead path.
+   */
+  const handlerFor = (job: ClaimedJob): JobHandler => {
+    if (options.handler) return options.handler;
+    const handler = resolveHandler(registry, job.type);
+    if (!handler) {
+      throw new Error(`Unknown job type: "${job.type}"`);
+    }
+    return handler;
+  };
 
   /**
    * Records a failed attempt: the job is scheduled for another try, or it is
@@ -126,8 +167,17 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
   const runJob = async (job: ClaimedJob): Promise<void> => {
     let failure: Error | null = null;
     try {
-      await handler(job);
+      const handler = handlerFor(job);
+      await handler(job, context);
     } catch (error) {
+      if (error instanceof CrashError) {
+        // A crash is not a job failure: the job stays 'processing' and the
+        // sweeper recovers it later.
+        logLine(
+          `[worker ${options.workerId}] job ${job.id} crashed: ${error.message}`,
+        );
+        throw error;
+      }
       // Non-Error throws are coerced to a message.
       failure = error instanceof Error ? error : new Error(String(error));
     }
