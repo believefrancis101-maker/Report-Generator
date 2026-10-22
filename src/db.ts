@@ -17,7 +17,9 @@ export type SqlParam = string | number | boolean | Date | Buffer | null;
 /** The one pool shared by the whole process. */
 export const pool = new Pool({
   connectionString: config.databaseUrl,
-  max: Math.max(4, config.concurrency * 2),
+  // CONCURRENCY job slots plus headroom for the claim loop, the stuck-job
+  // sweep and status polling.
+  max: config.concurrency + 3,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 10_000,
 });

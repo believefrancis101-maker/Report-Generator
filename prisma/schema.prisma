@@ -2,11 +2,15 @@
 //
 // Models for the durable job queue and the surrounding reporting domain.
 //
-// IMPORTANT: the CHECK constraints on `jobs` (status IN (...), attempts >= 0)
-// cannot be expressed in the Prisma schema language. They live in the
-// hand-edited migration SQL (prisma/migrations/...) and are the source of
-// truth - Prisma will never create or drop them. Do not remove them from the
-// migration by hand.
+// IMPORTANT: the CHECK constraints cannot be expressed in the Prisma schema
+// language. They live in the hand-edited migration SQL (prisma/migrations/...)
+// and are the source of truth - Prisma will never create or drop them. Do not
+// remove them from the migrations by hand.
+//
+//   jobs.status IN ('pending','processing','succeeded','failed','dead')
+//   jobs.attempts >= 0
+//   jobs.max_attempts > 0
+//   job_runs.outcome IS NULL OR IN ('succeeded','failed','crashed')
 //
 // The datasource URL is provided by prisma.config.ts (from DATABASE_URL).
 
@@ -21,7 +25,7 @@ datasource db {
 
 /// A unit of background work.
 model Job {
-  id              String    @id @default(uuid()) @db.Uuid
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type            String    @map("type")
   payload         Json      @db.JsonB
   /// One of: pending, processing, succeeded, failed, dead.
@@ -48,7 +52,7 @@ model Job {
 
 /// One row per execution attempt - the evidence trail of a job.
 model JobRun {
-  id          String    @id @default(uuid()) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   job_id      String    @map("job_id") @db.Uuid
   worker_id   String    @map("worker_id")
   started_at  DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
@@ -65,7 +69,7 @@ model JobRun {
 
 /// The generated report belonging to exactly one job.
 model Report {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   job_id     String   @unique @map("job_id") @db.Uuid
   summary    Json     @db.JsonB
   pdf        Bytes    @db.ByteA

@@ -28,16 +28,42 @@ describe('migration SQL', () => {
 
   it('keeps the jobs status CHECK constraint', () => {
     const sql = migrations.map((m) => m.sql).join('\n');
-    expect(sql).toContain('jobs_status_check');
     expect(sql).toMatch(
-      /CHECK\s*\(\s*"?status"?\s+IN\s*\(\s*'pending'\s*,\s*'processing'\s*,\s*'succeeded'\s*,\s*'failed'\s*,\s*'dead'\s*\)/i,
+      /ADD\s+CONSTRAINT\s+"?jobs_status_check"?\s+CHECK\s*\(\s*"?status"?\s+IN\s*\(\s*'pending'\s*,\s*'processing'\s*,\s*'succeeded'\s*,\s*'failed'\s*,\s*'dead'\s*\)/i,
     );
   });
 
   it('keeps the jobs attempts CHECK constraint', () => {
     const sql = migrations.map((m) => m.sql).join('\n');
-    expect(sql).toContain('jobs_attempts_check');
-    expect(sql).toMatch(/CHECK\s*\(\s*"?attempts"?\s*>=\s*0\s*\)/i);
+    expect(sql).toMatch(
+      /ADD\s+CONSTRAINT\s+"?jobs_attempts_check"?\s+CHECK\s*\(\s*"?attempts"?\s*>=\s*0\s*\)/i,
+    );
+  });
+
+  it('keeps the jobs max_attempts CHECK constraint', () => {
+    const sql = migrations.map((m) => m.sql).join('\n');
+    expect(sql).toMatch(
+      /ADD\s+CONSTRAINT\s+"?jobs_max_attempts_check"?\s+CHECK\s*\(\s*"?max_attempts"?\s*>\s*0\s*\)/i,
+    );
+  });
+
+  it('keeps the job_runs outcome CHECK constraint', () => {
+    const sql = migrations.map((m) => m.sql).join('\n');
+    expect(sql).toMatch(
+      /ADD\s+CONSTRAINT\s+"?job_runs_outcome_check"?\s+CHECK\s*\(\s*"?outcome"?\s+IS\s+NULL\s+OR\s+"?outcome"?\s+IN\s*\(\s*'succeeded'\s*,\s*'failed'\s*,\s*'crashed'\s*\)/i,
+    );
+  });
+
+  it('keeps the db-generated uuid defaults for jobs, job_runs and reports', () => {
+    const sql = migrations.map((m) => m.sql).join('\n');
+    for (const table of ['jobs', 'job_runs', 'reports']) {
+      expect(sql).toMatch(
+        new RegExp(
+          `ALTER\\s+TABLE\\s+"${table}"\\s+ALTER\\s+COLUMN\\s+"id"\\s+SET\\s+DEFAULT\\s+gen_random_uuid\\(\\)`,
+          'i',
+        ),
+      );
+    }
   });
 
   it('keeps the (status, run_at) index on jobs', () => {
