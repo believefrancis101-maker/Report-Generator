@@ -4,6 +4,7 @@ import express, {
   type RequestHandler,
 } from 'express';
 import { createJobsRouter } from './api/jobs.js';
+import { createPagesRouter } from './pages/router.js';
 
 /**
  * Builds the Express application.
@@ -21,6 +22,7 @@ export function createApp(): Express {
   });
 
   app.use(createJobsRouter());
+  app.use(createPagesRouter());
 
   const notFound: RequestHandler = (_req, res) => {
     res.status(404).json({ error: 'Not found' });

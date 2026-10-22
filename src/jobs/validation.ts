@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { deriveIdempotencyKey } from './idempotency.js';
+import { JOB_STATUSES } from './status.js';
 
 /**
- * Request validation for the enqueue endpoint.
+ * Request validation for the job endpoints.
  */
 
 /** True when the string is a real calendar date (rejects e.g. 2024-02-30). */
@@ -67,6 +68,40 @@ export interface RequestIssue {
   path: string;
   message: string;
 }
+
+/** Job ids are UUIDs; anything else cannot name a job. */
+export const jobIdSchema = z.uuid('must be a UUID');
+
+/** The list endpoint accepts exactly the five job states. */
+export const jobStatusSchema = z.enum(JOB_STATUSES);
+
+/** `GET /api/jobs` and `GET /jobs` share these query parameters. */
+export const listJobsQuerySchema = z.object({
+  status: jobStatusSchema.optional(),
+  limit: z.coerce
+    .number()
+    .int('limit must be an integer')
+    .min(1, 'limit must be at least 1')
+    .max(200, 'limit must be at most 200')
+    .default(50),
+  offset: z.coerce
+    .number()
+    .int('offset must be an integer')
+    .min(0, 'offset must be at least 0')
+    .default(0),
+});
+
+/** The query of the jobs HTML page: the same filters plus `refresh`. */
+export const jobsPageQuerySchema = listJobsQuerySchema
+  .omit({ limit: true, offset: true })
+  .extend({
+    refresh: z
+      .string()
+      .optional()
+      .refine((value) => value === undefined || value === '2', {
+        message: 'refresh must be 2 (seconds)',
+      }),
+  });
 
 export type ParseEnqueueResult =
   | { ok: true; value: EnqueueRequest }
