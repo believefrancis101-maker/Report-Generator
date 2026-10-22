@@ -3,15 +3,16 @@
 Task 2: **Background Jobs Done Properly** - a report generator backed by a durable
 job queue that lives in PostgreSQL (no external broker).
 
-> **Stage 1 status:** project scaffold and typed configuration only.
-> Job queue behaviour (enqueue/status endpoints, claiming, retries, backoff,
-> stuck-job recovery, dead-letter handling) is **not** implemented yet.
+> **Stage 2 status:** schema, migration and seed are in place.
+> The queue behaviour itself (enqueue/status endpoints, claiming, processing,
+> retries, backoff, stuck-job recovery, dead-letter handling) is **not**
+> implemented yet.
 
 ## Stack
 
 - Node.js + TypeScript
 - Express (API server)
-- PostgreSQL + Prisma
+- PostgreSQL + Prisma (schema/migrations) + `pg` (plain SQL for the queue core)
 - Zod (typed configuration)
 - Vitest (tests)
 
@@ -21,15 +22,19 @@ job queue that lives in PostgreSQL (no external broker).
 report-generator/
 ├── docker-compose.yml        # PostgreSQL only, container: report-generator-postgres
 ├── prisma/
-│   └── schema.prisma         # Prisma scaffold (job model lands in a later stage)
+│   ├── migrations/            # Hand-edited migration SQL (source of truth)
+│   ├── schema.prisma          # jobs, job_runs, reports, sales_orders
+│   └── seed.ts                # 500k sales_orders rows in one SQL statement
 ├── prisma.config.ts          # Prisma CLI configuration
 ├── src/
 │   ├── config.ts             # Typed, Zod-validated configuration
+│   ├── db.ts                 # Shared `pg` pool for the queue core
 │   ├── server.ts             # API entrypoint  -> npm run dev:api
 │   ├── worker.ts             # Worker entrypoint -> npm run dev:worker
 │   └── generated/            # Prisma client (generated, git-ignored)
 ├── tests/
-│   └── config.test.ts        # Configuration validation tests
+│   ├── config.test.ts        # Configuration validation tests
+│   └── migration.test.ts     # Guards the hand-written CHECK constraints
 ├── .env.example              # Copy to .env (never committed)
 ├── .gitignore
 ├── package.json
@@ -46,6 +51,8 @@ stopped and scaled separately.
 npm install                    # also runs `prisma generate` (postinstall)
 cp .env.example .env          # adjust DATABASE_URL if needed
 docker compose up -d          # starts report-generator-postgres
+npm run prisma:migrate        # applies prisma/migrations to the database
+npm run seed                  # 500,000 sales_orders rows
 npm run dev:api               # API server  (http://localhost:3000)
 npm run dev:worker            # worker process
 ```
@@ -69,6 +76,7 @@ need to redo it (e.g. after a schema change).
 | `npm test` | Run the Vitest suite |
 | `npm run prisma:generate` | Generate the Prisma client |
 | `npm run prisma:migrate` | Apply/create a development migration |
+| `npm run seed` | Seed 500,000 `sales_orders` rows |
 
 ## Configuration
 
@@ -122,18 +130,78 @@ postgresql://report:report_local_dev@localhost:55432/report_generator?schema=pub
 The container is published on host port `55432` (override with `POSTGRES_PORT`).
 Keep `POSTGRES_PORT` and the port in `DATABASE_URL` in sync.
 
+### Schema
+
+| Table | Purpose |
+| --- | --- |
+| `jobs` | The queue: `type`, `payload` (jsonb), `status`, `attempts`, `max_attempts`, `last_error`, `run_at`, `started_at`, `finished_at`, `idempotency_key` (unique), `created_at`, `updated_at` |
+| `job_runs` | One row per execution attempt: `job_id` (FK), `worker_id`, `started_at`, `finished_at`, `outcome`, `error` |
+| `reports` | The produced artefact: `job_id` (unique FK), `summary` (jsonb), `pdf` (bytea), `created_at` |
+| `sales_orders` | Source data: `customer_name`, `category`, `amount_minor`, `created_at` |
+
+Column names are `snake_case` (Prisma `@map` / `@@map`).
+
+### Migrations - the hand-edited SQL is the source of truth
+
+The Prisma schema language **cannot express CHECK constraints**, so the two
+constraints on `jobs` are written by hand into the migration SQL:
+
+```sql
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_status_check"
+    CHECK ("status" IN ('pending', 'processing', 'succeeded', 'failed', 'dead'));
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_attempts_check"
+    CHECK ("attempts" >= 0);
+```
+
+Workflow for schema changes:
+
+```bash
+npm run prisma:migrate -- --create-only --name <name>   # generate the SQL
+# edit prisma/migrations/<name>/migration.sql by hand (CHECK constraints, ...)
+npm run prisma:migrate                                 # apply it
+```
+
+A later `prisma migrate dev` does **not** drop those constraints (Prisma does
+not model CHECK constraints, so it never emits a `DROP CONSTRAINT` for them).
+`tests/migration.test.ts` fails if the hand-written constraints ever disappear
+from the migration files. Verify against a live database with:
+
+```bash
+docker exec report-generator-postgres psql -U report -d report_generator -c "\d jobs"
+```
+
+### Seeding
+
+```bash
+npm run seed            # or: npx prisma db seed
+```
+
+The seed inserts **500,000** `sales_orders` rows with a single
+`INSERT ... SELECT ... FROM generate_series(...)` statement (no JS loop):
+5,000 distinct customer names (50 first names x 100 last names), 10 categories
+and `created_at` spread across the last 24 months. It truncates
+`sales_orders` first, so it is safe to re-run.
+
+### Database access
+
+`src/db.ts` exports the shared `pg` pool used by the queue core (claim,
+failure handling, sweep, retry) so that the hot-path SQL stays plain and
+visible. Prisma is used for the schema, migrations and simple reads.
+
 ## Tests
 
 ```bash
 npm test
 ```
 
-The suite currently covers configuration parsing, defaults and rejection of
-invalid environments (including the guarantee that the database URL is never
-leaked into error messages).
+The suite covers configuration parsing, defaults and rejection of invalid
+environments (including the guarantee that the database URL is never leaked
+into error messages), plus the presence of the hand-written CHECK constraints
+and indexes in the migration SQL.
 
 ## Roadmap
 
 - [x] Stage 1 - scaffold and typed configuration
-- [ ] Stage 2 - job schema, enqueue/status endpoints, claiming, worker processing
-- [ ] Stage 3 - retries, exponential backoff, stuck-job recovery, dead-letter handling
+- [x] Stage 2 - schema, migration (with CHECK constraints) and seed
+- [ ] Stage 3 - enqueue/status endpoints, claiming, worker processing
+- [ ] Stage 4 - retries, exponential backoff, stuck-job recovery, dead-letter handling

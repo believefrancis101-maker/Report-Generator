@@ -1,8 +1,12 @@
-// Prisma schema - Stage 1 scaffold.
+// Prisma schema - Stage 2.
 //
-// The job model (and its status/attempt bookkeeping) is intentionally NOT
-// defined yet: it is introduced in a later stage together with the queue
-// implementation. This file only wires up the generator and the datasource.
+// Models for the durable job queue and the surrounding reporting domain.
+//
+// IMPORTANT: the CHECK constraints on `jobs` (status IN (...), attempts >= 0)
+// cannot be expressed in the Prisma schema language. They live in the
+// hand-edited migration SQL (prisma/migrations/...) and are the source of
+// truth - Prisma will never create or drop them. Do not remove them from the
+// migration by hand.
 //
 // The datasource URL is provided by prisma.config.ts (from DATABASE_URL).
 
@@ -13,4 +17,73 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+/// A unit of background work.
+model Job {
+  id              String    @id @default(uuid()) @db.Uuid
+  type            String    @map("type")
+  payload         Json      @db.JsonB
+  /// One of: pending, processing, succeeded, failed, dead.
+  /// Constrained by the CHECK constraint in the migration SQL.
+  status          String    @default("pending") @map("status")
+  /// Number of delivery attempts so far. Constrained by CHECK (attempts >= 0).
+  attempts        Int       @default(0) @map("attempts")
+  max_attempts    Int       @map("max_attempts")
+  last_error      String?   @map("last_error")
+  /// Earliest time the job may be claimed.
+  run_at          DateTime  @default(now()) @map("run_at") @db.Timestamptz(3)
+  started_at      DateTime? @map("started_at") @db.Timestamptz(3)
+  finished_at     DateTime? @map("finished_at") @db.Timestamptz(3)
+  idempotency_key String    @unique @map("idempotency_key")
+  created_at      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updated_at      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  runs   JobRun[]
+  report Report?
+
+  @@index([status, run_at], map: "jobs_status_run_at_idx")
+  @@map("jobs")
+}
+
+/// One row per execution attempt - the evidence trail of a job.
+model JobRun {
+  id          String    @id @default(uuid()) @db.Uuid
+  job_id      String    @map("job_id") @db.Uuid
+  worker_id   String    @map("worker_id")
+  started_at  DateTime  @default(now()) @map("started_at") @db.Timestamptz(3)
+  finished_at DateTime? @map("finished_at") @db.Timestamptz(3)
+  /// One of: succeeded, failed, crashed (nullable while the run is in flight).
+  outcome     String?   @map("outcome")
+  error       String?
+
+  job Job @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@index([job_id], map: "job_runs_job_id_idx")
+  @@map("job_runs")
+}
+
+/// The generated report belonging to exactly one job.
+model Report {
+  id         String   @id @default(uuid()) @db.Uuid
+  job_id     String   @unique @map("job_id") @db.Uuid
+  summary    Json     @db.JsonB
+  pdf        Bytes    @db.ByteA
+  created_at DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  job Job @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+/// Source data for the reports.
+model SalesOrder {
+  id            String   @id @default(uuid()) @db.Uuid
+  customer_name String   @map("customer_name")
+  category      String
+  amount_minor  Int      @map("amount_minor")
+  created_at    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([created_at], map: "sales_orders_created_at_idx")
+  @@map("sales_orders")
 }
