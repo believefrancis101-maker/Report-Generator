@@ -1,23 +1,17 @@
 /**
  * API server entrypoint.
  *
- * Validates the configuration, starts an HTTP server and exposes a health
- * endpoint.
+ * Validates the configuration, starts an HTTP server and exposes the job
+ * endpoints.
  */
 import 'dotenv/config';
-import express from 'express';
+import { createApp } from './app.js';
 import { ConfigError, loadConfig } from './config.js';
 
 function main(): void {
   const config = loadConfig();
 
-  const app = express();
-  app.use(express.json());
-
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', service: 'report-generator-api' });
-  });
-
+  const app = createApp();
   const server = app.listen(config.port, () => {
     console.log(`[api] listening on http://localhost:${config.port}`);
     console.log('[api] database: configured (connection string is not logged)');
