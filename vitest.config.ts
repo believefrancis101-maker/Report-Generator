@@ -5,6 +5,9 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.ts'],
     reporters: ['verbose'],
+    // Points DATABASE_URL at DATABASE_URL_TEST before any test module (and
+    // therefore before src/db.ts) is imported.
+    setupFiles: ['./tests/setup.ts'],
     // The test files that talk to the database share one PostgreSQL
     // instance, so they must not run at the same time.
     fileParallelism: false,

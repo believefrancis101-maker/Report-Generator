@@ -41,6 +41,8 @@ report-generator/
 │   ├── schema.prisma          # jobs, job_runs, reports, sales_orders
 │   └── seed.ts                # 500k sales_orders rows in one SQL statement
 ├── prisma.config.ts          # Prisma CLI configuration
+├── scripts/
+│   └── test-db.ts            # Creates and migrates the test database
 ├── src/
 │   ├── api/
 │   │   └── jobs.ts            # Job JSON endpoints (enqueue, status, list, report, retry)
@@ -80,6 +82,7 @@ report-generator/
 │   ├── worker.ts             # Worker entrypoint -> npm run dev:worker
 │   └── generated/            # Prisma client (generated, git-ignored)
 ├── tests/
+│   ├── setup.ts              # Points DATABASE_URL at the test database
 │   ├── api.test.ts           # Status, list, retry and report endpoints
 │   ├── backoff.test.ts       # Backoff unit tests
 │   ├── config.test.ts        # Configuration validation tests
@@ -107,6 +110,7 @@ cp .env.example .env          # adjust DATABASE_URL if needed
 docker compose up -d          # starts report-generator-postgres
 npm run prisma:migrate        # applies prisma/migrations to the database
 npm run seed                  # 500,000 sales_orders rows
+npm run test:setup            # creates report_generator_test and migrates it
 npm run dev:api               # API server  (http://localhost:3000)
 npm run dev:worker            # worker process
 ```
@@ -127,7 +131,8 @@ need to redo it (e.g. after a schema change).
 | `npm run start:api` | Run the compiled API server |
 | `npm run start:worker` | Run the compiled worker |
 | `npm run typecheck` | TypeScript check without emitting |
-| `npm test` | Run the Vitest suite |
+| `npm test` | Run the Vitest suite against the test database |
+| `npm run test:setup` | Create the test database (if missing) and apply the migrations |
 | `npm run prisma:generate` | Generate the Prisma client |
 | `npm run prisma:migrate` | Apply/create a development migration |
 | `npm run seed` | Seed 500,000 `sales_orders` rows |
@@ -501,6 +506,7 @@ when the environment is invalid. The database URL is never logged.
 | Variable | Required | Default | Notes |
 | --- | --- | --- | --- |
 | `DATABASE_URL` | yes | - | PostgreSQL connection string, must be non-empty |
+| `DATABASE_URL_TEST` | for tests | - | Database `npm test` uses; the app never reads it |
 | `PORT` | no | `3000` | API server port (1-65535) |
 | `MAX_ATTEMPTS` | no | `5` | Delivery attempts per job (positive integer) |
 | `CONCURRENCY` | no | `3` | Concurrent jobs per worker (positive integer) |
@@ -623,8 +629,24 @@ used for the schema, migrations and simple reads.
 ## Tests
 
 ```bash
+npm run test:setup   # once: create report_generator_test and apply migrations
 npm test
 ```
+
+The suite runs against a **separate database** from the one you develop on -
+`report_generator_test` in the same container. `npm run test:setup` creates it
+when it is missing and applies `prisma/migrations` to it with
+`prisma migrate deploy`, so the test schema can never drift from the real one.
+
+`tests/setup.ts` is a Vitest `setupFiles` entry: it runs before any test module
+is imported, and therefore before `src/db.ts` builds its connection pool, and
+sets `DATABASE_URL` to `DATABASE_URL_TEST`. If both variables name the same
+database it refuses to run, so a misconfiguration cannot delete development
+data. Nothing in the application reads `DATABASE_URL_TEST`.
+
+Because the test and development databases are separate, a worker running
+against the development database cannot claim the jobs the tests create - and
+the tests never write to the development tables.
 
 The suite covers configuration parsing, defaults and rejection of invalid
 environments (including the guarantee that the database URL is never leaked
