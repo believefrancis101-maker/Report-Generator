@@ -1,0 +1,24 @@
+WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
+2026-10-22T16:59:20.698Z clean slate: removed 2 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-22T16:59:20.731Z started worker-a (worker) pid=3620 log=evidence/logs/two-workers-worker-a.log
+2026-10-22T16:59:20.749Z started worker-b (worker) pid=28072 log=evidence/logs/two-workers-worker-b.log
+
+enqueuing 100 jobs while both workers poll
+  PASS: all 100 enqueues created a new job
+enqueued 100 jobs in 150.4ms
+2026-10-22T16:59:26.006Z all 100 jobs succeeded
+
+total job_runs: 100
+distinct jobs in job_runs: 100
+jobs with more than one run: 0
+
+per worker:
+  worker    runs  distinct jobs  max concurrent
+  --------  ----  -------------  --------------
+  worker-a  51    51             3             
+  worker-b  49    49             3             
+  PASS: no job has more than one run
+  PASS: one run per job
+  PASS: each worker stayed at or below CONCURRENCY=3
+2026-10-22T16:59:26.041Z stopping worker-b pid=28072
+2026-10-22T16:59:26.080Z stopping worker-a pid=3620

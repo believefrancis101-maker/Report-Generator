@@ -1,0 +1,3 @@
+2026-10-22T16:59:05.291Z [api] listening on http://localhost:3000
+2026-10-22T16:59:05.291Z [api] database: configured (connection string is not logged)
+2026-10-22T16:59:05.664Z [exit] code=null signal=SIGTERM

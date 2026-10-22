@@ -1,0 +1,12 @@
+2026-10-22T16:57:43.826Z 2026-10-22T16:57:43.826Z [worker evidence-backoff] started | concurrency=1 pollIntervalMs=250 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-22T16:57:43.868Z 2026-10-22T16:57:43.868Z [worker evidence-backoff] claimed 1e491f33-45d3-4169-a1fa-f88908a1184e | concurrent=1
+2026-10-22T16:57:43.875Z 2026-10-22T16:57:43.875Z [worker evidence-backoff] job 1e491f33-45d3-4169-a1fa-f88908a1184e failed (attempt 1/5): Injected failure (FAIL_RATE=1) | retry in 2923ms at 2026-10-22T16:57:46.792Z
+2026-10-22T16:57:47.031Z 2026-10-22T16:57:47.031Z [worker evidence-backoff] claimed 1e491f33-45d3-4169-a1fa-f88908a1184e | concurrent=1
+2026-10-22T16:57:47.038Z 2026-10-22T16:57:47.038Z [worker evidence-backoff] job 1e491f33-45d3-4169-a1fa-f88908a1184e failed (attempt 2/5): Injected failure (FAIL_RATE=1) | retry in 4031ms at 2026-10-22T16:57:51.063Z
+2026-10-22T16:57:51.275Z 2026-10-22T16:57:51.275Z [worker evidence-backoff] claimed 1e491f33-45d3-4169-a1fa-f88908a1184e | concurrent=1
+2026-10-22T16:57:51.291Z 2026-10-22T16:57:51.285Z [worker evidence-backoff] job 1e491f33-45d3-4169-a1fa-f88908a1184e failed (attempt 3/5): Injected failure (FAIL_RATE=1) | retry in 8850ms at 2026-10-22T16:58:00.127Z
+2026-10-22T16:58:00.271Z 2026-10-22T16:58:00.272Z [worker evidence-backoff] claimed 1e491f33-45d3-4169-a1fa-f88908a1184e | concurrent=1
+2026-10-22T16:58:00.279Z 2026-10-22T16:58:00.279Z [worker evidence-backoff] job 1e491f33-45d3-4169-a1fa-f88908a1184e failed (attempt 4/5): Injected failure (FAIL_RATE=1) | retry in 18715ms at 2026-10-22T16:58:18.987Z
+2026-10-22T16:58:19.145Z 2026-10-22T16:58:19.145Z [worker evidence-backoff] claimed 1e491f33-45d3-4169-a1fa-f88908a1184e | concurrent=1
+2026-10-22T16:58:19.151Z 2026-10-22T16:58:19.152Z [worker evidence-backoff] job 1e491f33-45d3-4169-a1fa-f88908a1184e is DEAD after 5 attempts: Injected failure (FAIL_RATE=1)
+2026-10-22T16:58:19.251Z [exit] code=null signal=SIGTERM

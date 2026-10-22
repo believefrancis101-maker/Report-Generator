@@ -1,0 +1,3 @@
+2026-10-22T16:58:49.926Z 2026-10-22T16:58:49.925Z [worker evidence-kill-a] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=8000 sweepIntervalMs=1000
+2026-10-22T16:58:49.966Z 2026-10-22T16:58:49.966Z [worker evidence-kill-a] claimed 96229105-7bd6-435d-9c13-75376ed28295 | concurrent=1
+2026-10-22T16:58:50.021Z [exit] code=null signal=SIGKILL

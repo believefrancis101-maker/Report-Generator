@@ -1,0 +1,5 @@
+2026-10-22T16:59:31.417Z 2026-10-22T16:59:31.416Z [worker evidence-crash-a] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-22T16:59:31.456Z 2026-10-22T16:59:31.456Z [worker evidence-crash-a] claimed 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d | concurrent=1
+2026-10-22T16:59:31.535Z [handler] aggregation for job 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d took 77ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:31.581Z [handler] report for 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d saved (3254 bytes, 77ms aggregation)
+2026-10-22T16:59:31.598Z [exit] code=1 signal=null

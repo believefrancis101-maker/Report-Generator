@@ -21,7 +21,14 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "evidence:concurrency": "tsx scripts/evidence-concurrency.ts",
+    "evidence:backoff": "tsx scripts/evidence-backoff.ts",
+    "evidence:kill-recovery": "tsx scripts/evidence-kill-recovery.ts",
+    "evidence:idempotency-key": "tsx scripts/evidence-idempotency-key.ts",
+    "evidence:two-workers": "tsx scripts/evidence-two-workers.ts",
+    "evidence:crash-after-work": "tsx scripts/evidence-crash-after-work.ts",
+    "evidence:all-statuses": "tsx scripts/evidence-all-statuses.ts"
   },
   "dependencies": {
     "@prisma/client": "^7.10.1",

@@ -1,0 +1,37 @@
+WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
+2026-10-22T16:59:30.838Z clean slate: removed 100 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-22T16:59:30.849Z started worker-a (worker) pid=26360 log=evidence/logs/crash-after-work-worker-a.log
+2026-10-22T16:59:30.854Z enqueued job 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d
+2026-10-22T16:59:31.598Z worker A exited with code 1
+  PASS: worker A crashed with a non-zero exit code
+AFTER THE CRASH (the report exists, the job is still processing, the run is open)
+  jobs     id=378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d status=processing attempts=0/5 run_at=2026-10-22T16:59:30.850Z started_at=2026-10-22T16:59:31.442Z finished_at=null last_error=null
+  job_runs worker=evidence-crash-a started_at=2026-10-22T16:59:31.442Z finished_at=null outcome=null error=null
+  reports  count=1
+  PASS: the report row was written before the crash
+
+worker A log lines:
+  2026-10-22T16:59:31.535Z [handler] aggregation for job 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d took 77ms (10 category-months, 10 top customers, 1 months)
+  2026-10-22T16:59:31.581Z [handler] report for 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d saved (3254 bytes, 77ms aggregation)
+  2026-10-22T16:59:31.598Z [exit] code=1 signal=null
+
+starting a normal worker to recover the crashed job
+2026-10-22T16:59:31.917Z started worker-b (worker) pid=24504 log=evidence/logs/crash-after-work-worker-b.log
+sweep log line (verbatim, with the capture timestamp):
+  2026-10-22T16:59:34.515Z 2026-10-22T16:59:34.515Z [worker evidence-crash-b] sweep recovered 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d -> pending (attempts=1)
+worker B log line (verbatim):
+  2026-10-22T16:59:34.630Z [handler] report for 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d already exists, skipping
+FINAL STATE
+  jobs     id=378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d status=succeeded attempts=1/5 run_at=2026-10-22T16:59:34.504Z started_at=2026-10-22T16:59:34.614Z finished_at=2026-10-22T16:59:34.631Z last_error=Recovered by sweep: stuck in processing for more than 3000ms
+  job_runs worker=evidence-crash-a started_at=2026-10-22T16:59:31.442Z finished_at=2026-10-22T16:59:34.504Z outcome=crashed error=Abandoned: worker did not finish; recovered by sweep
+  job_runs worker=evidence-crash-b started_at=2026-10-22T16:59:34.614Z finished_at=2026-10-22T16:59:34.631Z outcome=succeeded error=null
+  reports  count=1
+
+reports rows: 1
+aggregation log lines across both workers: 1 -> 2026-10-22T16:59:31.535Z [handler] aggregation for job 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d took 77ms (10 category-months, 10 top customers, 1 months)
+  PASS: the job is succeeded
+  PASS: attempts=1 (the crashed run counted once)
+  PASS: exactly one report row
+  PASS: job_runs shows crashed then succeeded
+  PASS: the aggregation ran exactly once
+2026-10-22T16:59:34.859Z stopping worker-b pid=24504

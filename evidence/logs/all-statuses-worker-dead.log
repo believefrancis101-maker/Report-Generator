@@ -1,0 +1,4 @@
+2026-10-22T17:01:38.589Z 2026-10-22T17:01:38.589Z [worker evidence-status-dead] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-22T17:01:38.623Z 2026-10-22T17:01:38.624Z [worker evidence-status-dead] claimed 38a33ce1-461f-473a-97ee-f796b77f7ec5 | concurrent=1
+2026-10-22T17:01:38.630Z 2026-10-22T17:01:38.630Z [worker evidence-status-dead] job 38a33ce1-461f-473a-97ee-f796b77f7ec5 is DEAD after 1 attempts: Injected failure (FAIL_RATE=1)
+2026-10-22T17:01:38.699Z [exit] code=null signal=SIGTERM

@@ -1,0 +1,7 @@
+2026-10-22T16:58:59.242Z 2026-10-22T16:58:59.241Z [worker evidence-kill-b] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=8000 sweepIntervalMs=1000
+2026-10-22T16:58:59.282Z 2026-10-22T16:58:59.281Z [worker evidence-kill-b] sweep recovered 96229105-7bd6-435d-9c13-75376ed28295 -> pending (attempts=1)
+2026-10-22T16:58:59.407Z 2026-10-22T16:58:59.406Z [worker evidence-kill-b] claimed 96229105-7bd6-435d-9c13-75376ed28295 | concurrent=1
+2026-10-22T16:58:59.507Z [handler] aggregation for job 96229105-7bd6-435d-9c13-75376ed28295 took 94ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:58:59.556Z [handler] report for 96229105-7bd6-435d-9c13-75376ed28295 saved (3257 bytes, 94ms aggregation)
+2026-10-22T16:58:59.566Z 2026-10-22T16:58:59.565Z [worker evidence-kill-b] finished 96229105-7bd6-435d-9c13-75376ed28295 | concurrent=1
+2026-10-22T16:58:59.612Z [exit] code=null signal=SIGTERM

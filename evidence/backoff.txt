@@ -1,0 +1,27 @@
+WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
+2026-10-22T16:57:43.231Z clean slate: removed 1 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-22T16:57:43.241Z started worker (worker) pid=26476 log=evidence/logs/backoff-worker.log
+2026-10-22T16:57:43.245Z enqueued job 1e491f33-45d3-4169-a1fa-f88908a1184e
+
+job 1e491f33-45d3-4169-a1fa-f88908a1184e
+worker log: C:\Users\USER\Desktop\Report-Generator\evidence\logs\backoff-worker.log
+
+  attempt  started_at                scheduled retry (worker log)         gap since previous start  exponential part  jitter window  
+  -------  ------------------------  -----------------------------------  ------------------------  ----------------  ---------------
+  1        2026-10-22T16:57:43.851Z  2026-10-22T16:57:46.792Z (+2923ms)   -                         -                 -              
+  2        2026-10-22T16:57:47.025Z  2026-10-22T16:57:51.063Z (+4031ms)   3174 ms                   2000 ms           2000..4500 ms  
+  3        2026-10-22T16:57:51.264Z  2026-10-22T16:58:00.127Z (+8850ms)   4239 ms                   4000 ms           4000..7500 ms  
+  4        2026-10-22T16:58:00.263Z  2026-10-22T16:58:18.987Z (+18715ms)  8999 ms                   8000 ms           8000..13500 ms 
+  5        2026-10-22T16:58:19.139Z  (none, last attempt)                 18876 ms                  16000 ms          16000..25500 ms
+
+jitter window check (nominal delay <= gap <= 1.5x nominal + poll slack):
+  attempt 2: gap=3174ms in [2000, 4500]  PASS  (previous attempt logged retry in 2923ms, jitter=923ms, at most 1000ms)
+  attempt 3: gap=4239ms in [4000, 7500]  PASS  (previous attempt logged retry in 4031ms, jitter=31ms, at most 2000ms)
+  attempt 4: gap=8999ms in [8000, 13500]  PASS  (previous attempt logged retry in 8850ms, jitter=850ms, at most 4000ms)
+  attempt 5: gap=18876ms in [16000, 25500]  PASS  (previous attempt logged retry in 18715ms, jitter=2715ms, at most 8000ms)
+  PASS: every gap lies inside its jitter window
+  PASS: the job ran exactly 5 times
+
+attempts=5/5 finished_at=2026-10-22T16:58:19.147Z last_error=Injected failure (FAIL_RATE=1)
+2026-10-22T16:58:19.239Z stopping worker pid=26476
+status=dead

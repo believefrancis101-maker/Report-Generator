@@ -1,0 +1,76 @@
+WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
+2026-10-22T16:56:36.265Z clean slate: removed 4 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-22T16:56:36.277Z started api (server) pid=27484 log=evidence/logs/concurrency-api.log
+2026-10-22T16:56:36.970Z api ready pid=27484 http://127.0.0.1:3000
+2026-10-22T16:56:36.980Z started worker (worker) pid=10816 log=evidence/logs/concurrency-worker.log
+
+POSTing 50 distinct sales_report jobs concurrently (distinct idempotency keys, payload 2025-06-01..2025-06-30).
+  #   HTTP  response time  job id                              
+  --  ----  -------------  ------------------------------------
+  1   202   147.2 ms       f263ac60-1b79-4211-9e01-41c50a297884
+  2   202   147.6 ms       90d22355-ebcc-42b9-b760-fa477583a2ec
+  3   202   149.7 ms       caf256f5-ead2-490b-82ef-acba94c71465
+  4   202   147.7 ms       09a927c5-6e5f-4bc0-810a-2a62ead55196
+  5   202   150.0 ms       4e29a116-c2ce-410e-922b-b2d40fe7efe0
+  6   202   150.6 ms       09a8d866-e5e4-43bd-8514-6430e3a143e8
+  7   202   151.0 ms       1cb3734f-89d9-49ef-b864-0c5de79b2063
+  8   202   151.8 ms       601c734e-4c92-4e82-94ed-24e83e97f713
+  9   202   152.7 ms       0b9d2f63-a37a-4d71-9e1b-96963ce3748e
+  10  202   154.1 ms       8bb9c4c5-437e-46f3-8958-3956e2b2a884
+  11  202   152.9 ms       2f8e956d-13b8-4fc1-9560-8c8fde3f8016
+  12  202   153.9 ms       1a2641e4-6548-40c5-a7ec-5618c0fa89c7
+  13  202   154.2 ms       20af9a3c-17f9-4b7b-b172-a257be513897
+  14  202   156.2 ms       863af174-7532-4b05-8ce2-72bde89ee36b
+  15  202   154.6 ms       4328f4eb-4498-47b9-8b62-907818e1b0c3
+  16  202   155.1 ms       8343bd0b-d044-49c2-b1f2-69bdb3766358
+  17  202   156.8 ms       02a1ea7a-4732-4734-ab17-ea671d1399ed
+  18  202   157.4 ms       d81d546f-7deb-4ee6-8464-3cd5d8b02e74
+  19  202   158.3 ms       192f05d5-dc44-4522-95ae-e913a94ed819
+  20  202   158.8 ms       aba986c4-41b1-44a1-9649-f53abbb70d85
+  21  202   159.6 ms       5b84bbdf-85f5-40d4-9fe6-5f621d59db88
+  22  202   161.9 ms       4f7d89fb-8f09-4a1a-9de4-7f8847971f3a
+  23  202   159.8 ms       68787bac-fa65-4c71-b196-20fc6b304f3f
+  24  202   163.0 ms       a788252b-36eb-4f7a-b55c-5845d24cf671
+  25  202   161.9 ms       713e3ca5-c5ed-48bd-9cdf-e32acbc14050
+  26  202   163.3 ms       42232793-a28d-4094-922e-469f0c5fb75e
+  27  202   164.9 ms       2e93be2b-f360-416f-a737-8f12032de6c5
+  28  202   163.9 ms       b4d7216d-9c82-4a7c-bf2c-d03842edb4e7
+  29  202   165.9 ms       7faa6844-46f8-4f04-a0c8-1620976ee9e4
+  30  202   166.8 ms       5f8b6542-0def-4037-bd0e-daf6d5d17264
+  31  202   167.6 ms       8a67430f-1089-4729-a17f-dd2161c813a7
+  32  202   169.3 ms       2ff47aa4-5620-4b67-8b8a-15b11f23ae09
+  33  202   168.2 ms       aac86eda-bc6f-4040-8e3d-aa7b52dedeed
+  34  202   170.5 ms       f2fe09e6-6fef-435a-8fd3-1be957432c35
+  35  202   171.4 ms       69fa3934-e4ec-41f2-ab43-864e4e87014f
+  36  202   172.4 ms       7e47f48c-ba99-4c00-8e45-ad323c4f9ef5
+  37  202   174.9 ms       c93e361a-42f7-4d7a-b583-454ec7c63b8c
+  38  202   177.4 ms       4343444d-119b-4a79-9726-8c74b6e3168f
+  39  202   178.0 ms       932ae220-efd4-4f0b-888e-3a27beb1e9f6
+  40  202   176.2 ms       97b58118-8fee-4786-ad2e-9503eb8b23b5
+  41  202   179.3 ms       8e92a038-ce94-4f7c-b49c-7444cacfd778
+  42  202   178.2 ms       28be26b4-32d9-492e-a76b-0e2e7ede6f67
+  43  202   182.3 ms       12bb0579-bf24-43e0-88d9-60de2c9360fa
+  44  202   182.5 ms       c7567773-e9ac-49c6-9b17-20479468295f
+  45  202   182.6 ms       9ba6c8a5-e1c1-4059-8b59-7909fbd09c09
+  46  202   182.5 ms       1838d4be-5272-4f27-9086-1d826ddcdf7b
+  47  202   182.5 ms       420aeb83-ebca-4c5c-adb3-449b8a464816
+  48  202   182.4 ms       2c815dd8-b7d1-4ded-91d1-bfd5660e612b
+  49  202   182.3 ms       044d7a94-5e1e-4dcc-9e2d-c4fe5abd18e1
+  50  202   181.8 ms       a0d188a0-ea26-4277-ba45-206c0077d384
+
+enqueue: 50 requests, wall=197.4ms, min=147.2ms, mean=164.7ms, max=182.6ms
+  PASS: every POST answered 202 Accepted
+2026-10-22T16:56:42.262Z 50/50 jobs succeeded (5.1s after the last response)
+
+worker log: C:\Users\USER\Desktop\Report-Generator\evidence\logs\concurrency-worker.log
+claimed jobs: 50
+processed jobs: 50
+max concurrent= value: 3
+histogram: concurrent=1: 30, concurrent=2: 34, concurrent=3: 36
+  PASS: max concurrent 3 never exceeded CONCURRENCY=3
+  PASS: the worker processed all 50 jobs
+
+rows now: jobs=50 succeeded=50
+raw worker log kept at C:\Users\USER\Desktop\Report-Generator\evidence\logs\concurrency-worker.log
+2026-10-22T16:56:42.266Z stopping worker pid=10816
+2026-10-22T16:56:42.286Z stopping api pid=27484

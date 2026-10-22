@@ -1,0 +1,198 @@
+2026-10-22T16:59:21.425Z 2026-10-22T16:59:21.424Z [worker worker-b] started | concurrency=3 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-22T16:59:21.466Z 2026-10-22T16:59:21.465Z [worker worker-b] claimed bc9dafee-ce90-40b3-8c7d-64589b6cbf22 | concurrent=1
+2026-10-22T16:59:21.479Z 2026-10-22T16:59:21.479Z [worker worker-b] claimed affe83d6-18b5-4d47-af4d-fe6622928936 | concurrent=2
+2026-10-22T16:59:21.494Z 2026-10-22T16:59:21.494Z [worker worker-b] claimed bf5bace6-b3f3-4c43-8190-0164b8285dc9 | concurrent=3
+2026-10-22T16:59:21.654Z [handler] aggregation for job bf5bace6-b3f3-4c43-8190-0164b8285dc9 took 152ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:21.719Z [handler] aggregation for job bc9dafee-ce90-40b3-8c7d-64589b6cbf22 took 251ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:21.732Z [handler] aggregation for job affe83d6-18b5-4d47-af4d-fe6622928936 took 218ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:21.743Z [handler] report for bf5bace6-b3f3-4c43-8190-0164b8285dc9 saved (3254 bytes, 152ms aggregation)
+2026-10-22T16:59:21.743Z [handler] report for bc9dafee-ce90-40b3-8c7d-64589b6cbf22 saved (3262 bytes, 251ms aggregation)
+2026-10-22T16:59:21.750Z [handler] report for affe83d6-18b5-4d47-af4d-fe6622928936 saved (3258 bytes, 218ms aggregation)
+2026-10-22T16:59:21.753Z 2026-10-22T16:59:21.753Z [worker worker-b] finished bf5bace6-b3f3-4c43-8190-0164b8285dc9 | concurrent=3
+2026-10-22T16:59:21.754Z 2026-10-22T16:59:21.754Z [worker worker-b] finished bc9dafee-ce90-40b3-8c7d-64589b6cbf22 | concurrent=2
+2026-10-22T16:59:21.759Z 2026-10-22T16:59:21.759Z [worker worker-b] finished affe83d6-18b5-4d47-af4d-fe6622928936 | concurrent=1
+2026-10-22T16:59:21.840Z 2026-10-22T16:59:21.840Z [worker worker-b] claimed df484172-b768-49b2-9171-059626d31035 | concurrent=1
+2026-10-22T16:59:21.850Z 2026-10-22T16:59:21.850Z [worker worker-b] claimed 74ce3b0c-7324-421f-ab39-8847d7908cc8 | concurrent=2
+2026-10-22T16:59:21.860Z 2026-10-22T16:59:21.860Z [worker worker-b] claimed 3eb71bc9-7149-46f5-9f06-dcefa3b38cce | concurrent=3
+2026-10-22T16:59:21.996Z [handler] aggregation for job df484172-b768-49b2-9171-059626d31035 took 154ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.010Z [handler] aggregation for job 3eb71bc9-7149-46f5-9f06-dcefa3b38cce took 123ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.018Z [handler] report for df484172-b768-49b2-9171-059626d31035 saved (3261 bytes, 154ms aggregation)
+2026-10-22T16:59:22.025Z [handler] report for 3eb71bc9-7149-46f5-9f06-dcefa3b38cce saved (3256 bytes, 123ms aggregation)
+2026-10-22T16:59:22.028Z 2026-10-22T16:59:22.028Z [worker worker-b] finished df484172-b768-49b2-9171-059626d31035 | concurrent=3
+2026-10-22T16:59:22.030Z [handler] aggregation for job 74ce3b0c-7324-421f-ab39-8847d7908cc8 took 177ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.038Z 2026-10-22T16:59:22.038Z [worker worker-b] finished 3eb71bc9-7149-46f5-9f06-dcefa3b38cce | concurrent=2
+2026-10-22T16:59:22.042Z [handler] report for 74ce3b0c-7324-421f-ab39-8847d7908cc8 saved (3258 bytes, 177ms aggregation)
+2026-10-22T16:59:22.049Z 2026-10-22T16:59:22.049Z [worker worker-b] finished 74ce3b0c-7324-421f-ab39-8847d7908cc8 | concurrent=1
+2026-10-22T16:59:22.077Z 2026-10-22T16:59:22.077Z [worker worker-b] claimed cb9648c0-4b57-4d0f-9a14-c9e9028a5820 | concurrent=1
+2026-10-22T16:59:22.084Z 2026-10-22T16:59:22.084Z [worker worker-b] claimed 9552fc69-5352-45d8-896b-d2bbd2f03d8b | concurrent=2
+2026-10-22T16:59:22.093Z 2026-10-22T16:59:22.093Z [worker worker-b] claimed 2e61a65d-af67-4f4e-91d9-f0af4be7d800 | concurrent=3
+2026-10-22T16:59:22.193Z [handler] aggregation for job cb9648c0-4b57-4d0f-9a14-c9e9028a5820 took 115ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.211Z [handler] report for cb9648c0-4b57-4d0f-9a14-c9e9028a5820 saved (3258 bytes, 115ms aggregation)
+2026-10-22T16:59:22.219Z 2026-10-22T16:59:22.219Z [worker worker-b] finished cb9648c0-4b57-4d0f-9a14-c9e9028a5820 | concurrent=3
+2026-10-22T16:59:22.220Z [handler] aggregation for job 9552fc69-5352-45d8-896b-d2bbd2f03d8b took 135ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.230Z [handler] aggregation for job 2e61a65d-af67-4f4e-91d9-f0af4be7d800 took 131ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.236Z [handler] report for 9552fc69-5352-45d8-896b-d2bbd2f03d8b saved (3259 bytes, 135ms aggregation)
+2026-10-22T16:59:22.241Z [handler] report for 2e61a65d-af67-4f4e-91d9-f0af4be7d800 saved (3257 bytes, 131ms aggregation)
+2026-10-22T16:59:22.244Z 2026-10-22T16:59:22.244Z [worker worker-b] finished 9552fc69-5352-45d8-896b-d2bbd2f03d8b | concurrent=2
+2026-10-22T16:59:22.248Z 2026-10-22T16:59:22.248Z [worker worker-b] finished 2e61a65d-af67-4f4e-91d9-f0af4be7d800 | concurrent=1
+2026-10-22T16:59:22.317Z 2026-10-22T16:59:22.317Z [worker worker-b] claimed f73e02b0-c8a5-4c58-85c6-070363c9f702 | concurrent=1
+2026-10-22T16:59:22.328Z 2026-10-22T16:59:22.328Z [worker worker-b] claimed 3cb9e706-ea21-4e09-902d-f279c72f8280 | concurrent=2
+2026-10-22T16:59:22.337Z 2026-10-22T16:59:22.337Z [worker worker-b] claimed bd3e2614-f9e2-42b8-9834-4604614d82b4 | concurrent=3
+2026-10-22T16:59:22.469Z [handler] aggregation for job f73e02b0-c8a5-4c58-85c6-070363c9f702 took 149ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.489Z [handler] report for f73e02b0-c8a5-4c58-85c6-070363c9f702 saved (3258 bytes, 149ms aggregation)
+2026-10-22T16:59:22.496Z [handler] aggregation for job 3cb9e706-ea21-4e09-902d-f279c72f8280 took 166ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.518Z [handler] report for 3cb9e706-ea21-4e09-902d-f279c72f8280 saved (3259 bytes, 166ms aggregation)
+2026-10-22T16:59:22.524Z 2026-10-22T16:59:22.524Z [worker worker-b] finished f73e02b0-c8a5-4c58-85c6-070363c9f702 | concurrent=3
+2026-10-22T16:59:22.532Z [handler] aggregation for job bd3e2614-f9e2-42b8-9834-4604614d82b4 took 171ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.539Z 2026-10-22T16:59:22.539Z [worker worker-b] finished 3cb9e706-ea21-4e09-902d-f279c72f8280 | concurrent=2
+2026-10-22T16:59:22.549Z [handler] report for bd3e2614-f9e2-42b8-9834-4604614d82b4 saved (3261 bytes, 171ms aggregation)
+2026-10-22T16:59:22.559Z 2026-10-22T16:59:22.558Z [worker worker-b] finished bd3e2614-f9e2-42b8-9834-4604614d82b4 | concurrent=1
+2026-10-22T16:59:22.562Z 2026-10-22T16:59:22.562Z [worker worker-b] claimed 72c343c8-c431-436a-9851-f7705b0c9ff5 | concurrent=1
+2026-10-22T16:59:22.579Z 2026-10-22T16:59:22.579Z [worker worker-b] claimed 277226c1-6f62-4ad5-bf78-187127917e0f | concurrent=2
+2026-10-22T16:59:22.592Z 2026-10-22T16:59:22.592Z [worker worker-b] claimed 72256f1f-12ee-4fdb-a75e-2b3ce30b6b09 | concurrent=3
+2026-10-22T16:59:22.708Z [handler] aggregation for job 72c343c8-c431-436a-9851-f7705b0c9ff5 took 145ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.721Z [handler] report for 72c343c8-c431-436a-9851-f7705b0c9ff5 saved (3254 bytes, 145ms aggregation)
+2026-10-22T16:59:22.731Z 2026-10-22T16:59:22.731Z [worker worker-b] finished 72c343c8-c431-436a-9851-f7705b0c9ff5 | concurrent=3
+2026-10-22T16:59:22.758Z [handler] aggregation for job 277226c1-6f62-4ad5-bf78-187127917e0f took 172ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.766Z [handler] aggregation for job 72256f1f-12ee-4fdb-a75e-2b3ce30b6b09 took 150ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.772Z [handler] report for 277226c1-6f62-4ad5-bf78-187127917e0f saved (3259 bytes, 172ms aggregation)
+2026-10-22T16:59:22.778Z [handler] report for 72256f1f-12ee-4fdb-a75e-2b3ce30b6b09 saved (3253 bytes, 150ms aggregation)
+2026-10-22T16:59:22.781Z 2026-10-22T16:59:22.781Z [worker worker-b] finished 277226c1-6f62-4ad5-bf78-187127917e0f | concurrent=2
+2026-10-22T16:59:22.785Z 2026-10-22T16:59:22.785Z [worker worker-b] finished 72256f1f-12ee-4fdb-a75e-2b3ce30b6b09 | concurrent=1
+2026-10-22T16:59:22.824Z 2026-10-22T16:59:22.824Z [worker worker-b] claimed 5e69cef2-15ba-4fa3-a0ab-f662d04269bc | concurrent=1
+2026-10-22T16:59:22.833Z 2026-10-22T16:59:22.833Z [worker worker-b] claimed 15eacd42-9a85-4fd1-980d-3464041ff34a | concurrent=2
+2026-10-22T16:59:22.842Z 2026-10-22T16:59:22.842Z [worker worker-b] claimed 602b319f-1859-4667-bd2b-5e8557959ab1 | concurrent=3
+2026-10-22T16:59:22.938Z [handler] aggregation for job 5e69cef2-15ba-4fa3-a0ab-f662d04269bc took 112ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.954Z [handler] report for 5e69cef2-15ba-4fa3-a0ab-f662d04269bc saved (3261 bytes, 112ms aggregation)
+2026-10-22T16:59:22.970Z 2026-10-22T16:59:22.970Z [worker worker-b] finished 5e69cef2-15ba-4fa3-a0ab-f662d04269bc | concurrent=3
+2026-10-22T16:59:22.978Z [handler] aggregation for job 15eacd42-9a85-4fd1-980d-3464041ff34a took 144ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.985Z [handler] aggregation for job 602b319f-1859-4667-bd2b-5e8557959ab1 took 129ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:22.992Z [handler] report for 15eacd42-9a85-4fd1-980d-3464041ff34a saved (3262 bytes, 144ms aggregation)
+2026-10-22T16:59:23.000Z 2026-10-22T16:59:22.999Z [worker worker-b] finished 15eacd42-9a85-4fd1-980d-3464041ff34a | concurrent=2
+2026-10-22T16:59:23.003Z [handler] report for 602b319f-1859-4667-bd2b-5e8557959ab1 saved (3256 bytes, 129ms aggregation)
+2026-10-22T16:59:23.012Z 2026-10-22T16:59:23.011Z [worker worker-b] finished 602b319f-1859-4667-bd2b-5e8557959ab1 | concurrent=1
+2026-10-22T16:59:23.057Z 2026-10-22T16:59:23.057Z [worker worker-b] claimed 941aa063-1743-41f3-a127-afe7c5fb77a7 | concurrent=1
+2026-10-22T16:59:23.065Z 2026-10-22T16:59:23.065Z [worker worker-b] claimed 560239e0-c06b-4d3e-b6ec-2666b48aa7fb | concurrent=2
+2026-10-22T16:59:23.073Z 2026-10-22T16:59:23.073Z [worker worker-b] claimed 3d944b54-fa0a-4d7c-91b3-fc99d16415ba | concurrent=3
+2026-10-22T16:59:23.160Z [handler] aggregation for job 941aa063-1743-41f3-a127-afe7c5fb77a7 took 101ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.173Z [handler] report for 941aa063-1743-41f3-a127-afe7c5fb77a7 saved (3257 bytes, 101ms aggregation)
+2026-10-22T16:59:23.173Z [handler] aggregation for job 560239e0-c06b-4d3e-b6ec-2666b48aa7fb took 107ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.185Z [handler] aggregation for job 3d944b54-fa0a-4d7c-91b3-fc99d16415ba took 103ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.192Z [handler] report for 560239e0-c06b-4d3e-b6ec-2666b48aa7fb saved (3258 bytes, 107ms aggregation)
+2026-10-22T16:59:23.201Z [handler] report for 3d944b54-fa0a-4d7c-91b3-fc99d16415ba saved (3253 bytes, 103ms aggregation)
+2026-10-22T16:59:23.204Z 2026-10-22T16:59:23.204Z [worker worker-b] finished 941aa063-1743-41f3-a127-afe7c5fb77a7 | concurrent=3
+2026-10-22T16:59:23.205Z 2026-10-22T16:59:23.205Z [worker worker-b] finished 560239e0-c06b-4d3e-b6ec-2666b48aa7fb | concurrent=2
+2026-10-22T16:59:23.213Z 2026-10-22T16:59:23.212Z [worker worker-b] finished 3d944b54-fa0a-4d7c-91b3-fc99d16415ba | concurrent=1
+2026-10-22T16:59:23.300Z 2026-10-22T16:59:23.300Z [worker worker-b] claimed 315ee108-4a57-4e0e-8582-2478160fd2aa | concurrent=1
+2026-10-22T16:59:23.316Z 2026-10-22T16:59:23.316Z [worker worker-b] claimed 09942d23-b2fb-43ea-895e-c98031f81901 | concurrent=2
+2026-10-22T16:59:23.328Z 2026-10-22T16:59:23.327Z [worker worker-b] claimed 84943a42-acb7-4214-a20b-15a38d1da65a | concurrent=3
+2026-10-22T16:59:23.428Z [handler] aggregation for job 315ee108-4a57-4e0e-8582-2478160fd2aa took 126ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.439Z [handler] aggregation for job 09942d23-b2fb-43ea-895e-c98031f81901 took 121ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.446Z [handler] report for 315ee108-4a57-4e0e-8582-2478160fd2aa saved (3256 bytes, 126ms aggregation)
+2026-10-22T16:59:23.451Z [handler] report for 09942d23-b2fb-43ea-895e-c98031f81901 saved (3257 bytes, 121ms aggregation)
+2026-10-22T16:59:23.457Z 2026-10-22T16:59:23.457Z [worker worker-b] finished 315ee108-4a57-4e0e-8582-2478160fd2aa | concurrent=3
+2026-10-22T16:59:23.460Z [handler] aggregation for job 84943a42-acb7-4214-a20b-15a38d1da65a took 114ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.466Z 2026-10-22T16:59:23.466Z [worker worker-b] finished 09942d23-b2fb-43ea-895e-c98031f81901 | concurrent=2
+2026-10-22T16:59:23.472Z [handler] report for 84943a42-acb7-4214-a20b-15a38d1da65a saved (3254 bytes, 114ms aggregation)
+2026-10-22T16:59:23.479Z 2026-10-22T16:59:23.479Z [worker worker-b] finished 84943a42-acb7-4214-a20b-15a38d1da65a | concurrent=1
+2026-10-22T16:59:23.542Z 2026-10-22T16:59:23.542Z [worker worker-b] claimed 2e88c1c4-cd15-48f2-872b-e4b4e890885f | concurrent=1
+2026-10-22T16:59:23.550Z 2026-10-22T16:59:23.550Z [worker worker-b] claimed 2d485d53-b81c-4977-a608-0ee8c9860e71 | concurrent=2
+2026-10-22T16:59:23.558Z 2026-10-22T16:59:23.558Z [worker worker-b] claimed 968171f3-fc08-4445-9429-295eeb565fbd | concurrent=3
+2026-10-22T16:59:23.647Z [handler] aggregation for job 2e88c1c4-cd15-48f2-872b-e4b4e890885f took 103ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.662Z [handler] report for 2e88c1c4-cd15-48f2-872b-e4b4e890885f saved (3256 bytes, 103ms aggregation)
+2026-10-22T16:59:23.664Z [handler] aggregation for job 968171f3-fc08-4445-9429-295eeb565fbd took 96ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.671Z [handler] aggregation for job 2d485d53-b81c-4977-a608-0ee8c9860e71 took 120ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.683Z [handler] report for 968171f3-fc08-4445-9429-295eeb565fbd saved (3251 bytes, 96ms aggregation)
+2026-10-22T16:59:23.684Z 2026-10-22T16:59:23.684Z [worker worker-b] finished 2e88c1c4-cd15-48f2-872b-e4b4e890885f | concurrent=3
+2026-10-22T16:59:23.684Z [handler] report for 2d485d53-b81c-4977-a608-0ee8c9860e71 saved (3258 bytes, 120ms aggregation)
+2026-10-22T16:59:23.686Z 2026-10-22T16:59:23.686Z [worker worker-b] finished 968171f3-fc08-4445-9429-295eeb565fbd | concurrent=2
+2026-10-22T16:59:23.689Z 2026-10-22T16:59:23.689Z [worker worker-b] finished 2d485d53-b81c-4977-a608-0ee8c9860e71 | concurrent=1
+2026-10-22T16:59:23.771Z 2026-10-22T16:59:23.771Z [worker worker-b] claimed 6c100a67-2197-4fcd-bc43-4f6b13481af5 | concurrent=1
+2026-10-22T16:59:23.777Z 2026-10-22T16:59:23.777Z [worker worker-b] claimed 80016baa-bca4-4373-9530-9c4b8836da7d | concurrent=2
+2026-10-22T16:59:23.782Z 2026-10-22T16:59:23.782Z [worker worker-b] claimed 7b3b7316-bac6-4b80-bb31-e1759b75e343 | concurrent=3
+2026-10-22T16:59:23.901Z [handler] aggregation for job 6c100a67-2197-4fcd-bc43-4f6b13481af5 took 128ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.907Z [handler] aggregation for job 80016baa-bca4-4373-9530-9c4b8836da7d took 128ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.914Z [handler] report for 6c100a67-2197-4fcd-bc43-4f6b13481af5 saved (3258 bytes, 128ms aggregation)
+2026-10-22T16:59:23.917Z [handler] report for 80016baa-bca4-4373-9530-9c4b8836da7d saved (3256 bytes, 128ms aggregation)
+2026-10-22T16:59:23.918Z 2026-10-22T16:59:23.918Z [worker worker-b] finished 6c100a67-2197-4fcd-bc43-4f6b13481af5 | concurrent=3
+2026-10-22T16:59:23.921Z 2026-10-22T16:59:23.921Z [worker worker-b] finished 80016baa-bca4-4373-9530-9c4b8836da7d | concurrent=2
+2026-10-22T16:59:23.944Z [handler] aggregation for job 7b3b7316-bac6-4b80-bb31-e1759b75e343 took 130ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:23.951Z [handler] report for 7b3b7316-bac6-4b80-bb31-e1759b75e343 saved (3254 bytes, 130ms aggregation)
+2026-10-22T16:59:23.955Z 2026-10-22T16:59:23.955Z [worker worker-b] finished 7b3b7316-bac6-4b80-bb31-e1759b75e343 | concurrent=1
+2026-10-22T16:59:24.021Z 2026-10-22T16:59:24.020Z [worker worker-b] claimed 5cc5c447-9fb5-47ce-ac15-4f0d3944c7cd | concurrent=1
+2026-10-22T16:59:24.039Z 2026-10-22T16:59:24.039Z [worker worker-b] claimed cb3a3f43-91f2-4349-ab21-7fffb779390d | concurrent=2
+2026-10-22T16:59:24.070Z 2026-10-22T16:59:24.070Z [worker worker-b] claimed 59cf9cfd-2192-454e-b745-9b1186fba783 | concurrent=3
+2026-10-22T16:59:24.169Z [handler] aggregation for job 5cc5c447-9fb5-47ce-ac15-4f0d3944c7cd took 145ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.179Z [handler] report for 5cc5c447-9fb5-47ce-ac15-4f0d3944c7cd saved (3250 bytes, 145ms aggregation)
+2026-10-22T16:59:24.183Z 2026-10-22T16:59:24.183Z [worker worker-b] finished 5cc5c447-9fb5-47ce-ac15-4f0d3944c7cd | concurrent=3
+2026-10-22T16:59:24.211Z [handler] aggregation for job 59cf9cfd-2192-454e-b745-9b1186fba783 took 125ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.217Z [handler] report for 59cf9cfd-2192-454e-b745-9b1186fba783 saved (3253 bytes, 125ms aggregation)
+2026-10-22T16:59:24.221Z 2026-10-22T16:59:24.220Z [worker worker-b] finished 59cf9cfd-2192-454e-b745-9b1186fba783 | concurrent=2
+2026-10-22T16:59:24.226Z [handler] aggregation for job cb3a3f43-91f2-4349-ab21-7fffb779390d took 177ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.233Z [handler] report for cb3a3f43-91f2-4349-ab21-7fffb779390d saved (3255 bytes, 177ms aggregation)
+2026-10-22T16:59:24.237Z 2026-10-22T16:59:24.237Z [worker worker-b] finished cb3a3f43-91f2-4349-ab21-7fffb779390d | concurrent=1
+2026-10-22T16:59:24.296Z 2026-10-22T16:59:24.296Z [worker worker-b] claimed 24417486-54e7-4fa8-bb2a-ed7a3ce95160 | concurrent=1
+2026-10-22T16:59:24.318Z 2026-10-22T16:59:24.317Z [worker worker-b] claimed 9bf2212c-29d3-463b-862a-41350d54ea0b | concurrent=2
+2026-10-22T16:59:24.340Z 2026-10-22T16:59:24.339Z [worker worker-b] claimed 043156a2-d051-4fd0-928f-f60e84488479 | concurrent=3
+2026-10-22T16:59:24.447Z [handler] aggregation for job 24417486-54e7-4fa8-bb2a-ed7a3ce95160 took 146ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.454Z [handler] report for 24417486-54e7-4fa8-bb2a-ed7a3ce95160 saved (3262 bytes, 146ms aggregation)
+2026-10-22T16:59:24.461Z 2026-10-22T16:59:24.461Z [worker worker-b] finished 24417486-54e7-4fa8-bb2a-ed7a3ce95160 | concurrent=3
+2026-10-22T16:59:24.484Z [handler] aggregation for job 9bf2212c-29d3-463b-862a-41350d54ea0b took 158ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.492Z [handler] report for 9bf2212c-29d3-463b-862a-41350d54ea0b saved (3261 bytes, 158ms aggregation)
+2026-10-22T16:59:24.496Z 2026-10-22T16:59:24.495Z [worker worker-b] finished 9bf2212c-29d3-463b-862a-41350d54ea0b | concurrent=2
+2026-10-22T16:59:24.517Z [handler] aggregation for job 043156a2-d051-4fd0-928f-f60e84488479 took 151ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.526Z [handler] report for 043156a2-d051-4fd0-928f-f60e84488479 saved (3258 bytes, 151ms aggregation)
+2026-10-22T16:59:24.530Z 2026-10-22T16:59:24.530Z [worker worker-b] finished 043156a2-d051-4fd0-928f-f60e84488479 | concurrent=1
+2026-10-22T16:59:24.579Z 2026-10-22T16:59:24.579Z [worker worker-b] claimed 4a1d4aac-dfe5-4296-ad63-9ec422beecea | concurrent=1
+2026-10-22T16:59:24.594Z 2026-10-22T16:59:24.594Z [worker worker-b] claimed 6c6ca784-8551-4818-bb8a-71ce95858250 | concurrent=2
+2026-10-22T16:59:24.628Z 2026-10-22T16:59:24.628Z [worker worker-b] claimed 024f1ebc-20c8-438d-97cc-f5bacdc6874f | concurrent=3
+2026-10-22T16:59:24.721Z [handler] aggregation for job 4a1d4aac-dfe5-4296-ad63-9ec422beecea took 139ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.731Z [handler] report for 4a1d4aac-dfe5-4296-ad63-9ec422beecea saved (3261 bytes, 139ms aggregation)
+2026-10-22T16:59:24.734Z 2026-10-22T16:59:24.734Z [worker worker-b] finished 4a1d4aac-dfe5-4296-ad63-9ec422beecea | concurrent=3
+2026-10-22T16:59:24.738Z [handler] aggregation for job 6c6ca784-8551-4818-bb8a-71ce95858250 took 142ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.747Z [handler] report for 6c6ca784-8551-4818-bb8a-71ce95858250 saved (3262 bytes, 142ms aggregation)
+2026-10-22T16:59:24.751Z 2026-10-22T16:59:24.751Z [worker worker-b] finished 6c6ca784-8551-4818-bb8a-71ce95858250 | concurrent=2
+2026-10-22T16:59:24.766Z [handler] aggregation for job 024f1ebc-20c8-438d-97cc-f5bacdc6874f took 135ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:24.774Z [handler] report for 024f1ebc-20c8-438d-97cc-f5bacdc6874f saved (3256 bytes, 135ms aggregation)
+2026-10-22T16:59:24.779Z 2026-10-22T16:59:24.779Z [worker worker-b] finished 024f1ebc-20c8-438d-97cc-f5bacdc6874f | concurrent=1
+2026-10-22T16:59:24.857Z 2026-10-22T16:59:24.856Z [worker worker-b] claimed 7dee7539-cc45-4a6f-9f2a-89c1c52a45c2 | concurrent=1
+2026-10-22T16:59:24.888Z 2026-10-22T16:59:24.887Z [worker worker-b] claimed 7e1f3bae-5268-49fd-85fc-18ac9e57d5a7 | concurrent=2
+2026-10-22T16:59:24.906Z 2026-10-22T16:59:24.906Z [worker worker-b] claimed 1fa8f898-7508-4ecf-b01f-d6b4ff5bd1af | concurrent=3
+2026-10-22T16:59:25.002Z [handler] aggregation for job 7dee7539-cc45-4a6f-9f2a-89c1c52a45c2 took 142ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.011Z [handler] report for 7dee7539-cc45-4a6f-9f2a-89c1c52a45c2 saved (3260 bytes, 142ms aggregation)
+2026-10-22T16:59:25.015Z 2026-10-22T16:59:25.015Z [worker worker-b] finished 7dee7539-cc45-4a6f-9f2a-89c1c52a45c2 | concurrent=3
+2026-10-22T16:59:25.047Z [handler] aggregation for job 7e1f3bae-5268-49fd-85fc-18ac9e57d5a7 took 157ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.055Z [handler] report for 7e1f3bae-5268-49fd-85fc-18ac9e57d5a7 saved (3260 bytes, 157ms aggregation)
+2026-10-22T16:59:25.062Z 2026-10-22T16:59:25.061Z [worker worker-b] finished 7e1f3bae-5268-49fd-85fc-18ac9e57d5a7 | concurrent=2
+2026-10-22T16:59:25.070Z [handler] aggregation for job 1fa8f898-7508-4ecf-b01f-d6b4ff5bd1af took 124ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.078Z [handler] report for 1fa8f898-7508-4ecf-b01f-d6b4ff5bd1af saved (3257 bytes, 124ms aggregation)
+2026-10-22T16:59:25.082Z 2026-10-22T16:59:25.082Z [worker worker-b] finished 1fa8f898-7508-4ecf-b01f-d6b4ff5bd1af | concurrent=1
+2026-10-22T16:59:25.125Z 2026-10-22T16:59:25.124Z [worker worker-b] claimed 159a78f4-d24a-4719-b52a-2f7c1b395198 | concurrent=1
+2026-10-22T16:59:25.154Z 2026-10-22T16:59:25.154Z [worker worker-b] claimed 4f89dbaf-6754-4a95-854f-de2bb4f00400 | concurrent=2
+2026-10-22T16:59:25.178Z 2026-10-22T16:59:25.178Z [worker worker-b] claimed 8c6f27df-bdb0-4dd7-a25d-8ac2d09eeba7 | concurrent=3
+2026-10-22T16:59:25.271Z [handler] aggregation for job 159a78f4-d24a-4719-b52a-2f7c1b395198 took 142ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.280Z [handler] report for 159a78f4-d24a-4719-b52a-2f7c1b395198 saved (3255 bytes, 142ms aggregation)
+2026-10-22T16:59:25.284Z 2026-10-22T16:59:25.283Z [worker worker-b] finished 159a78f4-d24a-4719-b52a-2f7c1b395198 | concurrent=3
+2026-10-22T16:59:25.307Z [handler] aggregation for job 4f89dbaf-6754-4a95-854f-de2bb4f00400 took 146ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.315Z [handler] report for 4f89dbaf-6754-4a95-854f-de2bb4f00400 saved (3257 bytes, 146ms aggregation)
+2026-10-22T16:59:25.319Z 2026-10-22T16:59:25.319Z [worker worker-b] finished 4f89dbaf-6754-4a95-854f-de2bb4f00400 | concurrent=2
+2026-10-22T16:59:25.319Z [handler] aggregation for job 8c6f27df-bdb0-4dd7-a25d-8ac2d09eeba7 took 118ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.326Z [handler] report for 8c6f27df-bdb0-4dd7-a25d-8ac2d09eeba7 saved (3258 bytes, 118ms aggregation)
+2026-10-22T16:59:25.330Z 2026-10-22T16:59:25.330Z [worker worker-b] finished 8c6f27df-bdb0-4dd7-a25d-8ac2d09eeba7 | concurrent=1
+2026-10-22T16:59:25.409Z 2026-10-22T16:59:25.408Z [worker worker-b] claimed 548dfa40-46f4-4d5f-8d94-db54278b5356 | concurrent=1
+2026-10-22T16:59:25.429Z 2026-10-22T16:59:25.429Z [worker worker-b] claimed 7b7fa1cb-ddbb-4074-854d-63c9c7fca23c | concurrent=2
+2026-10-22T16:59:25.447Z 2026-10-22T16:59:25.447Z [worker worker-b] claimed 633991a9-43f4-4967-be2a-3fa0662aebcf | concurrent=3
+2026-10-22T16:59:25.589Z [handler] aggregation for job 7b7fa1cb-ddbb-4074-854d-63c9c7fca23c took 151ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.597Z [handler] aggregation for job 633991a9-43f4-4967-be2a-3fa0662aebcf took 126ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.602Z [handler] aggregation for job 548dfa40-46f4-4d5f-8d94-db54278b5356 took 190ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.608Z [handler] report for 7b7fa1cb-ddbb-4074-854d-63c9c7fca23c saved (3260 bytes, 151ms aggregation)
+2026-10-22T16:59:25.609Z [handler] report for 633991a9-43f4-4967-be2a-3fa0662aebcf saved (3253 bytes, 126ms aggregation)
+2026-10-22T16:59:25.612Z [handler] report for 548dfa40-46f4-4d5f-8d94-db54278b5356 saved (3255 bytes, 190ms aggregation)
+2026-10-22T16:59:25.615Z 2026-10-22T16:59:25.614Z [worker worker-b] finished 633991a9-43f4-4967-be2a-3fa0662aebcf | concurrent=3
+2026-10-22T16:59:25.615Z 2026-10-22T16:59:25.615Z [worker worker-b] finished 7b7fa1cb-ddbb-4074-854d-63c9c7fca23c | concurrent=2
+2026-10-22T16:59:25.616Z 2026-10-22T16:59:25.616Z [worker worker-b] finished 548dfa40-46f4-4d5f-8d94-db54278b5356 | concurrent=1
+2026-10-22T16:59:25.687Z 2026-10-22T16:59:25.687Z [worker worker-b] claimed afca28bd-8578-449c-a3fa-7d8c64b420cf | concurrent=1
+2026-10-22T16:59:25.803Z [handler] aggregation for job afca28bd-8578-449c-a3fa-7d8c64b420cf took 110ms (10 category-months, 10 top customers, 1 months)
+2026-10-22T16:59:25.811Z [handler] report for afca28bd-8578-449c-a3fa-7d8c64b420cf saved (3258 bytes, 110ms aggregation)
+2026-10-22T16:59:25.814Z 2026-10-22T16:59:25.814Z [worker worker-b] finished afca28bd-8578-449c-a3fa-7d8c64b420cf | concurrent=1
+2026-10-22T16:59:26.080Z [exit] code=null signal=SIGTERM

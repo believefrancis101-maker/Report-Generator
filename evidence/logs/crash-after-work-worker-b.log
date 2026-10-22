@@ -1,0 +1,6 @@
+2026-10-22T16:59:32.478Z 2026-10-22T16:59:32.478Z [worker evidence-crash-b] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=3000 sweepIntervalMs=500
+2026-10-22T16:59:34.515Z 2026-10-22T16:59:34.515Z [worker evidence-crash-b] sweep recovered 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d -> pending (attempts=1)
+2026-10-22T16:59:34.627Z 2026-10-22T16:59:34.627Z [worker evidence-crash-b] claimed 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d | concurrent=1
+2026-10-22T16:59:34.630Z [handler] report for 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d already exists, skipping
+2026-10-22T16:59:34.642Z 2026-10-22T16:59:34.642Z [worker evidence-crash-b] finished 378d2c1b-0936-4d0c-be9c-a5c3c7dcba8d | concurrent=1
+2026-10-22T16:59:34.892Z [exit] code=null signal=SIGTERM

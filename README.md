@@ -41,7 +41,9 @@ report-generator/
 │   ├── schema.prisma          # jobs, job_runs, reports, sales_orders
 │   └── seed.ts                # 500k sales_orders rows in one SQL statement
 ├── prisma.config.ts          # Prisma CLI configuration
+├── evidence/                 # Break-it transcripts, raw process logs (see evidence/README.md)
 ├── scripts/
+│   ├── evidence-*.ts         # Break-it scripts: concurrency, backoff, kill, idempotency, ...
 │   └── test-db.ts            # Creates and migrates the test database
 ├── src/
 │   ├── api/
@@ -690,6 +692,45 @@ and one `409`). The page tests assert that `/dead` shows the payload, the full
 error and the run history, that a `last_error` of `<script>alert(1)</script>`
 is escaped rather than rendered, and that `/jobs` shows a count for all five
 statuses.
+
+## Break-it evidence
+
+`scripts/evidence-*.ts` (exposed as `npm run evidence:*`) try to break the queue
+on purpose and write down what happened. Each one starts from a clean queue -
+it prints a warning and deletes every row from `jobs`, cascading to `job_runs`
+and `reports`, and never touches `sales_orders`. They spawn the API and the
+workers as real child processes of `process.execPath`
+(`node --import tsx src/worker.ts`), so `SIGKILL` kills the process that
+actually holds the job. Output goes to `evidence/<name>.txt` and the raw
+timestamped child logs to `evidence/logs/`.
+
+Add `--pause` to a script to stop at each screenshot point; it prints
+`SCREENSHOT NOW: <what to capture>` and keeps the API up until Enter is pressed.
+`evidence/README.md` maps every output file (and screenshot) to the behaviour it
+demonstrates.
+
+| Check | Command | Observed |
+| --- | --- | --- |
+| Enqueue does not do the work | `npm run evidence:concurrency` | 50 simultaneous POSTs: 50 × `202`, wall 197.4 ms (min 147.2, mean 164.7, max 182.6 ms). All 50 processed with `CONCURRENCY=3`; the worker log never exceeds `concurrent=3` (`concurrent=1: 30, concurrent=2: 34, concurrent=3: 36`). |
+| Backoff and jitter | `npm run evidence:backoff` | 5 attempts. Gaps between starts 3,174 / 4,239 / 8,999 / 18,876 ms for nominal 2,000 / 4,000 / 8,000 / 16,000 ms; every gap inside `[nominal, 1.5 × nominal + poll slack]`. Final line: `status=dead`. |
+| Kill mid-job, recover | `npm run evidence:kill-recovery` | `SIGKILL` at `16:58:50.006Z`; the job stayed `processing` with one open run; the sweep recovered it at 8,653 ms of age (`attempts=1`), runs show `crashed` → `succeeded`, exactly one `reports` row. |
+| Idempotency key | `npm run evidence:idempotency-key` | First submit `202`, repeat `200 {"duplicate":true}` with the same id. 20 concurrent submits of another key: 1 × `202` + 19 × `200`, one distinct id, `count(*) = 1` per key. Same key with a different payload: `422`. |
+| Two workers, one queue | `npm run evidence:two-workers` | 100 jobs → 100 runs over 100 distinct jobs, 0 jobs with more than one run. worker-a 51 runs, worker-b 49, both peaked at `concurrent=3`. |
+| Crash after the work | `npm run evidence:crash-after-work` | Worker exited with code 1 after saving the report; the job was still `processing` with the run open. Recovery logged `report ... already exists, skipping`; final `attempts=1`, one `reports` row, and the aggregation log line appears once across both workers. |
+| All five states at once | `npm run evidence:all-statuses` | `pending 1, processing 1, succeeded 3, failed 1, dead 1`, produced by real workers; the API stayed up for the screenshot. |
+
+Real excerpts from the runs above:
+
+```text
+enqueue: 50 requests, wall=197.4ms, min=147.2ms, mean=164.7ms, max=182.6ms
+max concurrent= value: 3
+histogram: concurrent=1: 30, concurrent=2: 34, concurrent=3: 36
+
+attempt 2: gap=3174ms in [2000, 4500]  PASS  (previous attempt logged retry in 2923ms, jitter=923ms, at most 1000ms)
+attempt 5: gap=18876ms in [16000, 25500]  PASS  (previous attempt logged retry in 18715ms, jitter=2715ms, at most 8000ms)
+
+2026-10-22T16:58:59.281Z [worker evidence-kill-b] sweep recovered 96229105-7bd6-435d-9c13-75376ed28295 -> pending (attempts=1)
+```
 
 ## Status
 

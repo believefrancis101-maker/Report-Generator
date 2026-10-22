@@ -1,0 +1,53 @@
+WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
+2026-10-22T16:59:04.815Z clean slate: removed 1 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-22T16:59:04.825Z started api (server) pid=988 log=evidence/logs/idempotency-key-api.log
+2026-10-22T16:59:05.494Z api ready pid=988 http://127.0.0.1:3000
+
+the same key, twice, sequentially:
+  #  HTTP  response time  body                                                                                          
+  -  ----  -------------  ----------------------------------------------------------------------------------------------
+  1  202   60.0 ms        {"id":"f572205b-45b4-45c4-90f7-ac9dcd2ab895","status":"pending","attempts":0}                 
+  2  200   7.3 ms         {"id":"f572205b-45b4-45c4-90f7-ac9dcd2ab895","status":"pending","attempts":0,"duplicate":true}
+  PASS: the first submit answered 202
+  PASS: the second submit answered 200 with duplicate=true
+  PASS: both submits returned the same job id
+
+20 submits of another key at the same time:
+  #   HTTP  response time  body                                                                                          
+  --  ----  -------------  ----------------------------------------------------------------------------------------------
+  1   202   24.8 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0}                 
+  2   200   67.6 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  3   200   40.8 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  4   200   66.3 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  5   200   69.6 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  6   200   66.7 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  7   200   69.4 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  8   200   56.1 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  9   200   59.4 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  10  200   58.3 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  11  200   56.6 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  12  200   61.1 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  13  200   62.0 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  14  200   59.8 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  15  200   62.8 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  16  200   63.3 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  17  200   66.2 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  18  200   65.5 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  19  200   66.4 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+  20  200   66.8 ms        {"id":"460f5b43-91dc-4b3b-83bf-cfefc529e037","status":"pending","attempts":0,"duplicate":true}
+
+status codes: 200, 202
+202 accepted: 1, 200 duplicate: 19, distinct job ids: 1
+  PASS: exactly one insert, 19 duplicates, one job id
+
+rows per key:
+  idempotency_key           count
+  ------------------------  -----
+  evidence-idem-concurrent  1    
+  evidence-idem-sequential  1    
+  PASS: each key has exactly one row
+
+the same key with a different payload:
+  HTTP 422 {"error":"idempotency_key_reused","message":"This key was already used with a different request"}
+  PASS: the mismatching payload answered 422
+2026-10-22T16:59:05.645Z stopping api pid=988
