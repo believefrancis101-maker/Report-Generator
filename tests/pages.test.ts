@@ -111,6 +111,8 @@ describe('GET /', () => {
     // The form talks to the enqueue endpoint and polls the status endpoint.
     expect(html).toContain("'/api/jobs'");
     expect(html).toContain("'/api/jobs/'");
+    // Same label as the jobs table: attempts counts failed runs.
+    expect(html).toContain("addRow('Failed attempts', 'job-attempts')");
   });
 });
 
@@ -211,6 +213,8 @@ describe('GET /dead', () => {
     expect(html).toContain('worker-test-2');
     expect(html).toContain('connection reset');
     expect(html).toContain('ms</td>');
+    // The label matches the jobs table.
+    expect(html).toContain('<dt>Failed attempts</dt>');
     // The retry button carries the job id.
     expect(html).toContain(`data-retry="${id}"`);
   });

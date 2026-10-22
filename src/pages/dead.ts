@@ -73,7 +73,7 @@ function deadJobCard(job: DeadJobView): string {
   <dl>
     <dt>Type</dt>
     <dd>${escapeHtml(job.type)}</dd>
-    <dt>Attempts</dt>
+    <dt>Failed attempts</dt>
     <dd>${job.attempts}/${job.maxAttempts}</dd>
     <dt>Created</dt>
     <dd class="mono">${formatTimestamp(job.createdAt)}</dd>

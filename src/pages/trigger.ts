@@ -74,7 +74,7 @@ const SCRIPT = `
       dl.appendChild(dd);
     }
     addRow('Status', 'job-status');
-    addRow('Attempts', 'job-attempts');
+    addRow('Failed attempts', 'job-attempts');
     addRow('Last error', 'job-error');
     box.appendChild(dl);
 
