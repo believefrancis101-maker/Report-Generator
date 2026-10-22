@@ -45,6 +45,7 @@ report-generator/
 │   ├── api/
 │   │   └── jobs.ts            # POST /api/jobs
 │   ├── app.ts                # Express app factory
+│   ├── backoff.ts            # Exponential backoff with jitter (pure)
 │   ├── config.ts             # Typed, Zod-validated configuration
 │   ├── db.ts                 # Shared `pg` pool for the queue core
 │   ├── jobs/
@@ -54,6 +55,7 @@ report-generator/
 │   ├── worker/
 │   │   ├── claim.ts          # Atomic claim (FOR UPDATE SKIP LOCKED)
 │   │   ├── complete.ts       # Completion with fencing
+│   │   ├── fail.ts           # Failed attempt -> retry or dead
 │   │   ├── handler.ts        # Job handler (stub for now)
 │   │   ├── index.ts          # The worker loop (startWorker)
 │   │   └── log.ts            # The log formats
@@ -61,6 +63,7 @@ report-generator/
 │   ├── worker.ts             # Worker entrypoint -> npm run dev:worker
 │   └── generated/            # Prisma client (generated, git-ignored)
 ├── tests/
+│   ├── backoff.test.ts       # Backoff unit tests
 │   ├── config.test.ts        # Configuration validation tests
 │   ├── enqueue.test.ts       # API tests against the real database
 │   ├── migration.test.ts     # Guards the hand-written CHECK constraints
@@ -251,6 +254,49 @@ update affects zero rows. The worker then logs
 execution record as `crashed` - a slow worker can never overwrite the result
 of the worker that took the job over.
 
+**Failures are retried, then killed.** When the handler throws, the worker
+records the failure with one fenced statement:
+
+```sql
+UPDATE "jobs"
+SET
+    "attempts" = "attempts" + 1,
+    "last_error" = $3,
+    "status" = CASE WHEN "attempts" + 1 >= "max_attempts" THEN 'dead' ELSE 'failed' END,
+    "run_at" = CASE WHEN "attempts" + 1 >= "max_attempts" THEN "run_at"
+                    ELSE now() + ($4 * interval '1 millisecond') END,
+    "finished_at" = CASE WHEN "attempts" + 1 >= "max_attempts" THEN now() ELSE NULL END,
+    "updated_at" = now()
+WHERE "id" = $1 AND "status" = 'processing' AND "started_at" = $2
+RETURNING "status", "attempts", "run_at"
+```
+
+`failed` means the job will be retried once its `run_at` has passed; `dead`
+means the retries are exhausted and the job needs a human. The claim picks up
+`pending` and `failed` jobs, but never a `dead` one.
+
+```
+2026-10-22T13:55:22.905Z [worker host-31712] job eeec174d-… failed (attempt 1/3): Injected failure (FAIL_RATE=1) | retry in 275ms at 2026-10-22T13:55:23.166Z
+2026-10-22T13:55:24.936Z [worker host-31712] job eeec174d-… is DEAD after 3 attempts: Injected failure (FAIL_RATE=1)
+```
+
+**Backoff** - [`src/backoff.ts`](src/backoff.ts) is a pure function; the
+configuration and the source of randomness are injected, so it is unit tested
+without any I/O:
+
+```ts
+exponential = baseMs * 2 ** (failureCount - 1)   // the first retry waits ~base
+jitter     = Math.floor(random() * exponential * 0.5)
+delay      = Math.min(maxMs, exponential + jitter)
+```
+
+The jitter is what keeps a batch of failed jobs from retrying in lockstep -
+without it, jobs that failed together retry together and hit the failing
+dependency in a thundering herd. The delay is computed in JavaScript and
+handed to the database as a number of milliseconds
+(`now() + ($4 * interval '1 millisecond')`), so the schedule is based on the
+**database clock** and workers on different machines stay consistent.
+
 **Shutdown** - on `SIGTERM`/`SIGINT` the worker stops claiming, waits for the
 running jobs to finish, closes the pool and exits `0`. `SIGKILL` skips that
 on purpose: the job stays `processing` and is recovered by the sweeper.
@@ -399,7 +445,11 @@ database: they check that the concurrency cap is respected and actually
 reached, that every job ends up with exactly one execution record, that two
 workers competing for the same jobs never double-claim one, that a job with a
 future `run_at` waits, and that a lost claim cannot overwrite a job that was
-taken over by somebody else.
+taken over by somebody else. The retry tests check that a failing job goes
+`failed` -> `failed` -> `dead` with growing gaps between the attempts, that a
+job which fails once and then works ends up `succeeded`, that `last_error`
+holds the most recent failure, and that failing jobs do not leak a
+concurrency slot.
 
 ## Status
 
@@ -410,7 +460,8 @@ Implemented:
 - Independent API server and worker processes with a shared connection pool
 - `POST /api/jobs` with idempotency enforced by a database constraint
 - Worker with an atomic claim, a concurrency cap and fenced completion
+- Retries with exponential backoff and jitter, and a dead-letter state
 
 In progress:
 
-- Retry/backoff/dead-letter handling and the report generation
+- The stuck-job sweeper and the report generation

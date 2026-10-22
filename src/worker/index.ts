@@ -1,9 +1,18 @@
 import type { Pool } from 'pg';
 import { pool as sharedPool } from '../db.js';
+import { backoffDelayMs, type BackoffOptions } from '../backoff.js';
 import { claimJob, type ClaimedJob } from './claim.js';
 import { completeJob } from './complete.js';
+import { failJob } from './fail.js';
 import { createStubHandler, type JobHandler } from './handler.js';
-import { logClaimed, logFinished, logLostClaim, logLine } from './log.js';
+import {
+  logClaimed,
+  logFinished,
+  logJobDead,
+  logJobFailed,
+  logLine,
+  logLostClaim,
+} from './log.js';
 
 /**
  * The worker loop.
@@ -11,6 +20,9 @@ import { logClaimed, logFinished, logLostClaim, logLine } from './log.js';
  * The loop is a plain function so it can be started in-process by the tests
  * against a real database.
  */
+
+/** The maximum length of the error message stored on the job. */
+const MAX_ERROR_LENGTH = 2000;
 
 export interface StartWorkerOptions {
   /** Identity of this worker, e.g. `host-1234`. */
@@ -21,17 +33,14 @@ export interface StartWorkerOptions {
   pollIntervalMs: number;
   /** Artificial delay per job (used by the stub handler). */
   workDelayMs?: number;
+  /** Probability that the stub handler fails on purpose (0..1). */
+  failRate?: number;
+  /** The backoff configuration for retries. */
+  backoff: BackoffOptions;
   /** Performs the work of a job. Defaults to the stub handler. */
   handler?: JobHandler;
-  /**
-   * Called when a handler throws.
-   *
-   * TODO: the retry/backoff/dead-letter logic goes here - it will decide
-   * whether the job is scheduled for another attempt (`status = 'failed'`)
-   * or moved to the dead-letter state (`status = 'dead'`). Until then the
-   * job row is left untouched.
-   */
-  onJobFailure?: (job: ClaimedJob, error: Error) => void | Promise<void>;
+  /** Source of randomness for the backoff jitter and the stub handler. */
+  random?: () => number;
   /** Connection pool to use. Defaults to the shared pool. */
   db?: Pool;
 }
@@ -39,11 +48,16 @@ export interface StartWorkerOptions {
 export interface WorkerHandle {
   /** Stops claiming and waits for the running jobs to finish. */
   stop(): Promise<void>;
+  /** The number of jobs this worker is currently working on. */
+  activeCount(): number;
 }
 
 export function startWorker(options: StartWorkerOptions): WorkerHandle {
   const db = options.db ?? sharedPool;
-  const handler = options.handler ?? createStubHandler(options.workDelayMs ?? 0);
+  const random = options.random ?? Math.random;
+  const handler =
+    options.handler ??
+    createStubHandler(options.workDelayMs ?? 0, options.failRate ?? 0, random);
 
   let running = true;
   /** Jobs this process is currently working on. */
@@ -65,9 +79,65 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
       };
     });
 
+  /**
+   * Records a failed attempt: the job is scheduled for another try, or it is
+   * killed when the retries are exhausted.
+   */
+  const handleFailure = async (job: ClaimedJob, error: Error): Promise<void> => {
+    const message = error.message.slice(0, MAX_ERROR_LENGTH);
+    // The attempt that just failed.
+    const failureCount = job.attempts + 1;
+    const delayMs = backoffDelayMs(failureCount, options.backoff, random);
+
+    let outcome;
+    try {
+      outcome = await failJob(db, job, message, delayMs);
+    } catch (dbError) {
+      logLine(
+        `[worker ${options.workerId}] could not record the failure of job ${job.id}: ${
+          dbError instanceof Error ? dbError.message : String(dbError)
+        }`,
+      );
+      return;
+    }
+
+    if (!outcome.updated) {
+      // The claim was lost - the job was recovered or reclaimed meanwhile.
+      logLostClaim(options.workerId, job.id);
+      return;
+    }
+
+    if (outcome.status === 'dead') {
+      logJobDead(options.workerId, job.id, outcome.attempts ?? failureCount, message);
+      return;
+    }
+
+    logJobFailed(
+      options.workerId,
+      job.id,
+      outcome.attempts ?? failureCount,
+      job.max_attempts,
+      message,
+      delayMs,
+      outcome.runAt ?? new Date(),
+    );
+  };
+
   const runJob = async (job: ClaimedJob): Promise<void> => {
+    let failure: Error | null = null;
     try {
       await handler(job);
+    } catch (error) {
+      // Non-Error throws are coerced to a message.
+      failure = error instanceof Error ? error : new Error(String(error));
+    }
+
+    if (failure) {
+      await handleFailure(job, failure);
+      return;
+    }
+
+    try {
       const completed = await completeJob(db, job);
       if (completed) {
         logFinished(options.workerId, job.id, activeCount);
@@ -76,21 +146,11 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
         logLostClaim(options.workerId, job.id);
       }
     } catch (error) {
-      const failure = error instanceof Error ? error : new Error(String(error));
       logLine(
-        `[worker ${options.workerId}] job ${job.id} failed: ${failure.message}`,
+        `[worker ${options.workerId}] could not complete job ${job.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
       );
-      try {
-        // TODO: retry / backoff / dead-letter handling lives here.
-        await options.onJobFailure?.(job, failure);
-      } catch (hookError) {
-        logLine(
-          `[worker ${options.workerId}] failure hook for job ${job.id} threw: ${
-            hookError instanceof Error ? hookError.message : String(hookError)
-          }`,
-        );
-      }
-      // The job row is left alone until the retry logic exists.
     }
   };
 
@@ -139,5 +199,8 @@ export function startWorker(options: StartWorkerOptions): WorkerHandle {
     await Promise.allSettled([...inFlight]);
   };
 
-  return { stop };
+  return {
+    stop,
+    activeCount: () => activeCount,
+  };
 }

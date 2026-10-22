@@ -22,6 +22,11 @@ async function main(): Promise<void> {
     concurrency: config.concurrency,
     pollIntervalMs: config.pollIntervalMs,
     workDelayMs: config.workDelayMs,
+    failRate: config.failRate,
+    backoff: {
+      baseMs: config.backoffBaseMs,
+      maxMs: config.backoffMaxMs,
+    },
   });
 
   logLine(
