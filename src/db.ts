@@ -39,8 +39,9 @@ export async function query<Row extends QueryResultRow = QueryResultRow>(
 /** Runs a statement inside a transaction on a dedicated client. */
 export async function withTransaction<T>(
   fn: (client: PoolClient) => Promise<T>,
+  db: Pool = pool,
 ): Promise<T> {
-  const client = await pool.connect();
+  const client = await db.connect();
   try {
     await client.query('BEGIN');
     const result = await fn(client);

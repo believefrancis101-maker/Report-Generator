@@ -1,36 +1,53 @@
 /**
  * Worker entrypoint.
  *
- * Validates the configuration and runs as an independent OS process.
+ * Validates the configuration, starts the worker loop and shuts down cleanly
+ * on SIGTERM/SIGINT: stop claiming, wait for the running jobs to finish,
+ * close the pool, exit 0.
+ *
+ * SIGKILL skips this on purpose - a job that is killed that way stays
+ * 'processing' and is picked up again by the stuck-job sweeper.
  */
 import 'dotenv/config';
 import { ConfigError, loadConfig } from './config.js';
+import { closePool } from './db.js';
+import { startWorker } from './worker/index.js';
+import { logLine } from './worker/log.js';
 
-function main(): void {
+async function main(): Promise<void> {
   const config = loadConfig();
 
-  console.log(`[worker] started`);
-  console.log(`[worker] worker id: ${config.workerId}`);
-  console.log(
-    `[worker] concurrency=${config.concurrency} pollIntervalMs=${config.pollIntervalMs} sweepIntervalMs=${config.sweepIntervalMs}`,
+  const worker = startWorker({
+    workerId: config.workerId,
+    concurrency: config.concurrency,
+    pollIntervalMs: config.pollIntervalMs,
+    workDelayMs: config.workDelayMs,
+  });
+
+  logLine(
+    `[worker ${config.workerId}] started | concurrency=${config.concurrency} pollIntervalMs=${config.pollIntervalMs}`,
   );
-  console.log('[worker] no job processing yet');
 
-  // Keeps the process alive until it is asked to stop.
-  const keepAlive = setInterval(() => undefined, 60_000);
-
-  const shutdown = (signal: string): void => {
-    console.log(`[worker] received ${signal}, shutting down`);
-    clearInterval(keepAlive);
+  let shuttingDown = false;
+  const shutdown = async (signal: string): Promise<void> => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logLine(`[worker ${config.workerId}] received ${signal}, shutting down`);
+    await worker.stop();
+    await closePool();
     process.exit(0);
   };
 
-  process.on('SIGINT', () => shutdown('SIGINT'));
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGTERM', () => {
+    void shutdown('SIGTERM');
+  });
+  process.on('SIGINT', () => {
+    void shutdown('SIGINT');
+  });
 }
 
 try {
-  main();
+  await main();
 } catch (error) {
   if (error instanceof ConfigError) {
     console.error(error.message);
