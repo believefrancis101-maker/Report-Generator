@@ -1,9 +1,7 @@
 /**
  * Worker entrypoint.
  *
- * Stage 1 scope: process scaffold only. It validates the configuration and
- * stays alive as an independent OS process. Polling, claiming, processing,
- * retries and backoff are implemented in later stages.
+ * Validates the configuration and runs as an independent OS process.
  */
 import 'dotenv/config';
 import { ConfigError, loadConfig } from './config.js';
@@ -16,7 +14,7 @@ function main(): void {
   console.log(
     `[worker] concurrency=${config.concurrency} pollIntervalMs=${config.pollIntervalMs} sweepIntervalMs=${config.sweepIntervalMs}`,
   );
-  console.log('[worker] stage 1 scaffold: no job processing yet');
+  console.log('[worker] no job processing yet');
 
   // Keeps the process alive until it is asked to stop.
   const keepAlive = setInterval(() => undefined, 60_000);

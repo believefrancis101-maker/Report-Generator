@@ -2,7 +2,7 @@
   "name": "report-generator",
   "version": "0.1.0",
   "private": true,
-  "description": "Task 2: Background Jobs Done Properly - report generator with a durable job queue (Stage 1: scaffold and typed configuration)",
+  "description": "Report generator with a durable background job queue on PostgreSQL - no external broker required",
   "type": "module",
   "engines": {
     "node": ">=20.11.0"

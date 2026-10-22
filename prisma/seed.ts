@@ -1,5 +1,5 @@
 /**
- * Seed script - Stage 2.
+ * Seed script.
  *
  * Fills `sales_orders` with 500,000 rows using a single
  * `INSERT ... SELECT ... FROM generate_series(...)` statement (no JS loop).

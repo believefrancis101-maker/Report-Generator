@@ -1,20 +1,35 @@
 # report-generator
 
-Task 2: **Background Jobs Done Properly** - a report generator backed by a durable
-job queue that lives in PostgreSQL (no external broker).
+A **report generator with a durable background job queue** built on PostgreSQL -
+no external broker required. Jobs are stored in the database, claimed
+atomically by independent worker processes with plain SQL, retried with
+exponential backoff and audited attempt by attempt.
 
-> **Stage 2 status:** schema, migration and seed are in place.
-> The queue behaviour itself (enqueue/status endpoints, claiming, processing,
-> retries, backoff, stuck-job recovery, dead-letter handling) is **not**
-> implemented yet.
+The API server and the workers are separate processes, so they scale
+independently and a worker crash never takes the API down.
 
 ## Stack
 
-- Node.js + TypeScript
+- Node.js + TypeScript (strict)
 - Express (API server)
-- PostgreSQL + Prisma (schema/migrations) + `pg` (plain SQL for the queue core)
+- PostgreSQL + Prisma (schema and migrations) + `pg` (plain SQL for the queue core)
 - Zod (typed configuration)
 - Vitest (tests)
+- Docker Compose (local PostgreSQL)
+
+## Queue design
+
+The queue is designed around database-level guarantees rather than an external
+broker:
+
+| Concern | Approach |
+| --- | --- |
+| Enqueue | Idempotent via a unique `idempotency_key` on `jobs` |
+| Claiming | `UPDATE ... WHERE id IN (SELECT ... FOR UPDATE SKIP LOCKED LIMIT n)` - two workers never claim the same job |
+| Evidence | Every attempt writes a `job_runs` row (worker, start, finish, outcome, error) |
+| Retries | `attempts` is bounded by `max_attempts`; the next run time is computed with exponential backoff |
+| Failure handling | The database refuses invalid states - `CHECK (status IN (...))` and `CHECK (attempts >= 0)` |
+| Stuck jobs | A sweeper requeues jobs whose `started_at` is older than the stuck timeout |
 
 ## Project structure
 
@@ -92,7 +107,7 @@ when the environment is invalid. The database URL is never logged.
 | `CONCURRENCY` | no | `3` | Concurrent jobs per worker (positive integer) |
 | `BACKOFF_BASE_MS` | no | `2000` | Base retry delay in ms (positive integer) |
 | `BACKOFF_MAX_MS` | no | `300000` | Max retry delay in ms, must be `>= BACKOFF_BASE_MS` |
-| `STUCK_TIMEOUT_MS` | no | `60000` | A job running longer is considered stuck |
+| `STUCK_TIMEOUT_MS` | no | `60000` | A job running longer than this is considered stuck |
 | `SWEEP_INTERVAL_MS` | no | `15000` | Interval between stuck-job sweeps |
 | `POLL_INTERVAL_MS` | no | `1000` | Interval between job polls |
 | `WORKER_ID` | no | `<hostname>-<pid>` | Stable worker identity |
@@ -199,9 +214,14 @@ environments (including the guarantee that the database URL is never leaked
 into error messages), plus the presence of the hand-written CHECK constraints
 and indexes in the migration SQL.
 
-## Roadmap
+## Status
 
-- [x] Stage 1 - scaffold and typed configuration
-- [x] Stage 2 - schema, migration (with CHECK constraints) and seed
-- [ ] Stage 3 - enqueue/status endpoints, claiming, worker processing
-- [ ] Stage 4 - retries, exponential backoff, stuck-job recovery, dead-letter handling
+Implemented:
+
+- Typed, fail-fast configuration with Zod (secrets never logged)
+- Schema, migration and seed data, including database-level CHECK constraints
+- Independent API server and worker processes with a shared connection pool
+
+In progress:
+
+- Enqueue/status endpoints and the worker's claim/retry loop

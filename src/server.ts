@@ -1,9 +1,8 @@
 /**
  * API server entrypoint.
  *
- * Stage 1 scope: process scaffold only. It validates the configuration, starts
- * an HTTP server and exposes a health endpoint. Job/queue endpoints are added
- * in later stages.
+ * Validates the configuration, starts an HTTP server and exposes a health
+ * endpoint.
  */
 import 'dotenv/config';
 import express from 'express';

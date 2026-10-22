@@ -1,4 +1,4 @@
-// Prisma schema - Stage 2.
+// Prisma schema.
 //
 // Models for the durable job queue and the surrounding reporting domain.
 //
