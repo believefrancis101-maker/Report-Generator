@@ -83,20 +83,22 @@ await withChildren(evidence, async (track) => {
   await printJobState(evidence, jobId, 'BEFORE KILL (worker A is inside the 20s handler delay)');
   evidence.log('');
   evidence.log(`the API is still up: http://127.0.0.1:${PORT}/jobs`);
-  await pauseForScreenshot(
-    evidence,
-    `/jobs with the job processing (blue) and one open run - http://127.0.0.1:${PORT}/jobs`,
-  );
+  await pauseForScreenshot(evidence, {
+    what: `/jobs with the job processing (blue) and one open run - http://127.0.0.1:${PORT}/jobs`,
+    url: `http://127.0.0.1:${PORT}/jobs`,
+    file: 'kill-1-before.png',
+  });
 
   evidence.log('');
   await sigkill(evidence, workerA);
   await sleep(500);
 
   await printJobState(evidence, jobId, 'AFTER KILL (worker A is gone; nothing has swept yet)');
-  await pauseForScreenshot(
-    evidence,
-    `/jobs still shows the job as processing and the run is still open - http://127.0.0.1:${PORT}/jobs`,
-  );
+  await pauseForScreenshot(evidence, {
+    what: `/jobs still shows the job as processing and the run is still open - http://127.0.0.1:${PORT}/jobs`,
+    url: `http://127.0.0.1:${PORT}/jobs`,
+    file: 'kill-2-after-kill.png',
+  });
 
   // Worker B must only recover the job once it is older than the stuck timeout.
   const stuckSinceStart = await waitFor(
@@ -176,8 +178,9 @@ await withChildren(evidence, async (track) => {
   );
   evidence.log(`crash error: ${runs[0]?.error ?? 'null'}`);
 
-  await pauseForScreenshot(
-    evidence,
-    `/dead should still be empty and /jobs shows the job succeeded with 2 runs - http://127.0.0.1:${PORT}/jobs`,
-  );
+  await pauseForScreenshot(evidence, {
+    what: `/dead should still be empty and /jobs shows the job succeeded with 2 runs - http://127.0.0.1:${PORT}/jobs`,
+    url: `http://127.0.0.1:${PORT}/jobs`,
+    file: 'kill-3-after-recovery.png',
+  });
 });

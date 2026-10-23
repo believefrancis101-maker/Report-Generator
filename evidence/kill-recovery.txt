@@ -1,34 +1,34 @@
 WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
-2026-10-22T16:58:48.660Z clean slate: removed 1 job row(s); jobs=0; sales_orders=500000 (before and after)
-2026-10-22T16:58:48.673Z started api (server) pid=25692 log=evidence/logs/kill-recovery-api.log
-2026-10-22T16:58:49.360Z api ready pid=25692 http://127.0.0.1:3000
-2026-10-22T16:58:49.368Z started worker-a (worker) pid=23240 log=evidence/logs/kill-recovery-worker-a.log
+2026-10-23T13:05:36.227Z clean slate: removed 7 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-23T13:05:36.244Z started api (server) pid=26732 log=evidence/logs/kill-recovery-api.log
+2026-10-23T13:05:36.945Z api ready pid=26732 http://127.0.0.1:3000
+2026-10-23T13:05:36.955Z started worker-a (worker) pid=24532 log=evidence/logs/kill-recovery-worker-a.log
   PASS: the API accepted the job with 202
-2026-10-22T16:58:49.431Z enqueued job 96229105-7bd6-435d-9c13-75376ed28295
+2026-10-23T13:05:37.042Z enqueued job e1065e41-ae99-4a49-bc01-e50a292ed4a6
 
 BEFORE KILL (worker A is inside the 20s handler delay)
-  jobs     id=96229105-7bd6-435d-9c13-75376ed28295 status=processing attempts=0/5 run_at=2026-10-22T16:58:49.420Z started_at=2026-10-22T16:58:49.952Z finished_at=null last_error=null
-  job_runs worker=evidence-kill-a started_at=2026-10-22T16:58:49.952Z finished_at=null outcome=null error=null
+  jobs     id=e1065e41-ae99-4a49-bc01-e50a292ed4a6 status=processing attempts=0/5 run_at=2026-10-23T13:05:37.026Z started_at=2026-10-23T13:05:37.729Z finished_at=null last_error=null
+  job_runs worker=evidence-kill-a started_at=2026-10-23T13:05:37.729Z finished_at=null outcome=null error=null
   reports  count=0
 
 the API is still up: http://127.0.0.1:3000/jobs
 
-2026-10-22T16:58:50.006Z SIGKILL worker-a pid=23240 at 2026-10-22T16:58:50.006Z
-2026-10-22T16:58:50.021Z worker-a pid=23240 exited code=null
+2026-10-23T13:05:42.035Z SIGKILL worker-a pid=24532 at 2026-10-23T13:05:42.035Z
+2026-10-23T13:05:42.047Z worker-a pid=24532 exited code=null
 AFTER KILL (worker A is gone; nothing has swept yet)
-  jobs     id=96229105-7bd6-435d-9c13-75376ed28295 status=processing attempts=0/5 run_at=2026-10-22T16:58:49.420Z started_at=2026-10-22T16:58:49.952Z finished_at=null last_error=null
-  job_runs worker=evidence-kill-a started_at=2026-10-22T16:58:49.952Z finished_at=null outcome=null error=null
+  jobs     id=e1065e41-ae99-4a49-bc01-e50a292ed4a6 status=processing attempts=0/5 run_at=2026-10-23T13:05:37.026Z started_at=2026-10-23T13:05:37.729Z finished_at=null last_error=null
+  job_runs worker=evidence-kill-a started_at=2026-10-23T13:05:37.729Z finished_at=null outcome=null error=null
   reports  count=0
-2026-10-22T16:58:58.605Z job started_at=2026-10-22T16:58:49.952Z is 8653ms old (stuck timeout 8000ms)
-job age at recovery: 8653ms
-2026-10-22T16:58:58.618Z started worker-b (worker) pid=11160 log=evidence/logs/kill-recovery-worker-b.log
+2026-10-23T13:05:46.303Z job started_at=2026-10-23T13:05:37.729Z is 8574ms old (stuck timeout 8000ms)
+job age at recovery: 8574ms
+2026-10-23T13:05:46.314Z started worker-b (worker) pid=516 log=evidence/logs/kill-recovery-worker-b.log
 
 sweep log line (verbatim, with the capture timestamp):
-  2026-10-22T16:58:59.282Z 2026-10-22T16:58:59.281Z [worker evidence-kill-b] sweep recovered 96229105-7bd6-435d-9c13-75376ed28295 -> pending (attempts=1)
+  2026-10-23T13:05:47.044Z 2026-10-23T13:05:47.037Z [worker evidence-kill-b] sweep recovered e1065e41-ae99-4a49-bc01-e50a292ed4a6 -> pending (attempts=1)
 AFTER RECOVERY
-  jobs     id=96229105-7bd6-435d-9c13-75376ed28295 status=succeeded attempts=1/5 run_at=2026-10-22T16:58:59.264Z started_at=2026-10-22T16:58:59.385Z finished_at=2026-10-22T16:58:59.555Z last_error=Recovered by sweep: stuck in processing for more than 8000ms
-  job_runs worker=evidence-kill-a started_at=2026-10-22T16:58:49.952Z finished_at=2026-10-22T16:58:59.264Z outcome=crashed error=Abandoned: worker did not finish; recovered by sweep
-  job_runs worker=evidence-kill-b started_at=2026-10-22T16:58:59.385Z finished_at=2026-10-22T16:58:59.555Z outcome=succeeded error=null
+  jobs     id=e1065e41-ae99-4a49-bc01-e50a292ed4a6 status=succeeded attempts=1/5 run_at=2026-10-23T13:05:47.030Z started_at=2026-10-23T13:05:47.154Z finished_at=2026-10-23T13:05:47.523Z last_error=Recovered by sweep: stuck in processing for more than 8000ms
+  job_runs worker=evidence-kill-a started_at=2026-10-23T13:05:37.729Z finished_at=2026-10-23T13:05:47.030Z outcome=crashed error=Abandoned: worker did not finish; recovered by sweep
+  job_runs worker=evidence-kill-b started_at=2026-10-23T13:05:47.154Z finished_at=2026-10-23T13:05:47.523Z outcome=succeeded error=null
   reports  count=1
 
   PASS: the job is succeeded
@@ -36,5 +36,5 @@ AFTER RECOVERY
   PASS: exactly one report row
   PASS: job_runs shows crashed then succeeded
 crash error: Abandoned: worker did not finish; recovered by sweep
-2026-10-22T16:58:59.598Z stopping worker-b pid=11160
-2026-10-22T16:58:59.612Z stopping api pid=25692
+2026-10-23T13:05:48.812Z stopping worker-b pid=516
+2026-10-23T13:05:48.831Z stopping api pid=26732

@@ -1,7 +1,7 @@
-2026-10-22T16:58:59.242Z 2026-10-22T16:58:59.241Z [worker evidence-kill-b] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=8000 sweepIntervalMs=1000
-2026-10-22T16:58:59.282Z 2026-10-22T16:58:59.281Z [worker evidence-kill-b] sweep recovered 96229105-7bd6-435d-9c13-75376ed28295 -> pending (attempts=1)
-2026-10-22T16:58:59.407Z 2026-10-22T16:58:59.406Z [worker evidence-kill-b] claimed 96229105-7bd6-435d-9c13-75376ed28295 | concurrent=1
-2026-10-22T16:58:59.507Z [handler] aggregation for job 96229105-7bd6-435d-9c13-75376ed28295 took 94ms (10 category-months, 10 top customers, 1 months)
-2026-10-22T16:58:59.556Z [handler] report for 96229105-7bd6-435d-9c13-75376ed28295 saved (3257 bytes, 94ms aggregation)
-2026-10-22T16:58:59.566Z 2026-10-22T16:58:59.565Z [worker evidence-kill-b] finished 96229105-7bd6-435d-9c13-75376ed28295 | concurrent=1
-2026-10-22T16:58:59.612Z [exit] code=null signal=SIGTERM
+2026-10-23T13:05:47.006Z 2026-10-23T13:05:47.000Z [worker evidence-kill-b] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=8000 sweepIntervalMs=1000
+2026-10-23T13:05:47.044Z 2026-10-23T13:05:47.037Z [worker evidence-kill-b] sweep recovered e1065e41-ae99-4a49-bc01-e50a292ed4a6 -> pending (attempts=1)
+2026-10-23T13:05:47.164Z 2026-10-23T13:05:47.158Z [worker evidence-kill-b] claimed e1065e41-ae99-4a49-bc01-e50a292ed4a6 | concurrent=1
+2026-10-23T13:05:47.453Z [handler] aggregation for job e1065e41-ae99-4a49-bc01-e50a292ed4a6 took 287ms (10 category-months, 10 top customers, 1 months)
+2026-10-23T13:05:47.522Z [handler] report for e1065e41-ae99-4a49-bc01-e50a292ed4a6 saved (3256 bytes, 287ms aggregation)
+2026-10-23T13:05:47.533Z 2026-10-23T13:05:47.526Z [worker evidence-kill-b] finished e1065e41-ae99-4a49-bc01-e50a292ed4a6 | concurrent=1
+2026-10-23T13:05:48.831Z [exit] code=null signal=SIGTERM

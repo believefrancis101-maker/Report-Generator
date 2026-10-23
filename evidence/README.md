@@ -32,6 +32,17 @@ Enter. The API is left running during the pause, so `/jobs` and `/dead` can be
 opened in a browser. `EVIDENCE_PORT` overrides the API port (default `3000`) if
 it is taken.
 
+Add `--screenshots` to capture the same pages automatically with Playwright
+(Chromium) and continue without waiting:
+
+```bash
+npm run evidence:kill-recovery -- --screenshots
+npm run evidence:screenshots
+```
+
+The second command runs `kill-recovery` and `all-statuses` with the flag and
+then prints every file with its size.
+
 ## Output files
 
 Each run writes its complete output to `evidence/<name>.txt`. Every child's
@@ -51,12 +62,16 @@ script overwrites its own files.
 
 ## Screenshots
 
-The screenshots are not committed; re-run the script with `--pause` and capture
-these moments. The API stays up while the script waits.
+The screenshots were captured by script from the real pages during the runs:
+`npm run evidence:screenshots` runs `evidence:kill-recovery` and
+`evidence:all-statuses` with `--screenshots`, which captures each point with
+Playwright (Chromium) at 1400x900, 2x scale, full page, after the network is
+idle and the table has rendered.
 
 | Screenshot | Run | Capture |
 | --- | --- | --- |
-| `screenshots/jobs-processing.png` | `npm run evidence:kill-recovery -- --pause` | `/jobs` while the job is `processing` (blue badge) with one open run. |
-| `screenshots/jobs-after-kill.png` | same run, second pause | `/jobs` after the worker was killed: still `processing`, still one open run, nothing has swept yet. |
-| `screenshots/jobs-recovered.png` | same run, third pause | `/jobs` after recovery: `succeeded`, and `/dead` still empty. |
-| `screenshots/jobs-all-statuses.png` | `npm run evidence:all-statuses -- --pause` | `/jobs` showing all five statuses in the counts and in the table. |
+| ![Jobs while processing](screenshots/kill-1-before.png) | `npm run evidence:kill-recovery -- --screenshots` | `/jobs` while the job is `processing` (blue badge) with one open run. |
+| ![Jobs after the kill](screenshots/kill-2-after-kill.png) | same run, second capture | `/jobs` after the worker was killed: still `processing`, still one open run, nothing has swept yet. |
+| ![Jobs after recovery](screenshots/kill-3-after-recovery.png) | same run, third capture | `/jobs` after recovery: `succeeded`, `Failed attempts 1/5`, and the sweep message in `last_error`. |
+| ![All five statuses](screenshots/all-statuses.png) | `npm run evidence:all-statuses -- --screenshots` | `/jobs` showing all five statuses in the counts and in the table. |
+| ![Dead letter](screenshots/dead-letter.png) | same run, second capture | `/dead` with the dead job's payload, full error and run history. |

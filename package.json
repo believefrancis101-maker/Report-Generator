@@ -28,7 +28,8 @@
     "evidence:idempotency-key": "tsx scripts/evidence-idempotency-key.ts",
     "evidence:two-workers": "tsx scripts/evidence-two-workers.ts",
     "evidence:crash-after-work": "tsx scripts/evidence-crash-after-work.ts",
-    "evidence:all-statuses": "tsx scripts/evidence-all-statuses.ts"
+    "evidence:all-statuses": "tsx scripts/evidence-all-statuses.ts",
+    "evidence:screenshots": "tsx scripts/evidence-screenshots.ts"
   },
   "dependencies": {
     "@prisma/client": "^7.10.1",
@@ -44,6 +45,7 @@
     "@types/pdfkit": "^0.17.7",
     "@types/pg": "^8.23.1",
     "@vitest/coverage-v8": "^5.0.5",
+    "playwright": "^1.64.1",
     "prisma": "^7.10.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",

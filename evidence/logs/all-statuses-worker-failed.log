@@ -1,4 +1,4 @@
-2026-10-22T17:01:39.259Z 2026-10-22T17:01:39.258Z [worker evidence-status-failed] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
-2026-10-22T17:01:39.293Z 2026-10-22T17:01:39.293Z [worker evidence-status-failed] claimed 83f51c0a-edbf-4891-bcec-79b36748bdd4 | concurrent=1
-2026-10-22T17:01:39.301Z 2026-10-22T17:01:39.301Z [worker evidence-status-failed] job 83f51c0a-edbf-4891-bcec-79b36748bdd4 failed (attempt 1/5): Injected failure (FAIL_RATE=1) | retry in 600000ms at 2026-10-22T17:11:39.296Z
-2026-10-22T17:01:39.379Z [exit] code=null signal=SIGTERM
+2026-10-23T13:05:53.432Z 2026-10-23T13:05:53.434Z [worker evidence-status-failed] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-23T13:05:53.513Z 2026-10-23T13:05:53.516Z [worker evidence-status-failed] claimed 2c0fd21b-1974-4a65-9cd6-a32c7d023c27 | concurrent=1
+2026-10-23T13:05:53.591Z 2026-10-23T13:05:53.594Z [worker evidence-status-failed] job 2c0fd21b-1974-4a65-9cd6-a32c7d023c27 failed (attempt 1/5): Injected failure (FAIL_RATE=1) | retry in 600000ms at 2026-10-23T13:15:53.520Z
+2026-10-23T13:05:53.643Z [exit] code=null signal=SIGTERM

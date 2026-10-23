@@ -1,29 +1,29 @@
 WARNING: deleting every row from jobs (cascades to job_runs and reports) in database "report_generator". sales_orders is not touched.
-2026-10-22T17:01:36.362Z clean slate: removed 1 job row(s); jobs=0; sales_orders=500000 (before and after)
-2026-10-22T17:01:36.372Z started api (server) pid=23744 log=evidence/logs/all-statuses-api.log
-2026-10-22T17:01:37.061Z api ready pid=23744 http://127.0.0.1:3000
+2026-10-23T13:05:49.383Z clean slate: removed 1 job row(s); jobs=0; sales_orders=500000 (before and after)
+2026-10-23T13:05:49.395Z started api (server) pid=27632 log=evidence/logs/all-statuses-api.log
+2026-10-23T13:05:50.069Z api ready pid=27632 http://127.0.0.1:3000
 
 phase 1: succeeded - a normal worker completes three jobs
-2026-10-22T17:01:37.071Z started worker-ok (worker) pid=8480 log=evidence/logs/all-statuses-worker-ok.log
-2026-10-22T17:01:37.991Z three jobs succeeded: 8b8f713b-8edd-4208-9b93-017e8b0ed5a0, da06598e-b95c-4bf5-a97c-bbd1ba807017, c53523e2-c963-4194-afc7-0f94ed406640
-2026-10-22T17:01:37.992Z stopping worker-ok pid=8480
+2026-10-23T13:05:50.079Z started worker-ok (worker) pid=27108 log=evidence/logs/all-statuses-worker-ok.log
+2026-10-23T13:05:51.666Z three jobs succeeded: 1765eafa-260b-4f1c-8f64-2b670a408a33, b5318925-be80-49a6-8b6b-51f8b8ef08a7, 83332bf3-a6f1-4085-9678-a47e3e62bb1f
+2026-10-23T13:05:51.666Z stopping worker-ok pid=27108
 
 phase 2: dead - max_attempts=1 and a worker that always fails
-2026-10-22T17:01:38.054Z started worker-dead (worker) pid=176 log=evidence/logs/all-statuses-worker-dead.log
-2026-10-22T17:01:38.677Z job 38a33ce1-461f-473a-97ee-f796b77f7ec5 is dead
-2026-10-22T17:01:38.677Z stopping worker-dead pid=176
+2026-10-23T13:05:51.732Z started worker-dead (worker) pid=17116 log=evidence/logs/all-statuses-worker-dead.log
+2026-10-23T13:05:52.688Z job 226d4ad8-87e5-44a6-ac06-744bf95762a0 is dead
+2026-10-23T13:05:52.688Z stopping worker-dead pid=17116
 
 phase 3: failed - one failure, run_at ten minutes in the future
-2026-10-22T17:01:38.710Z started worker-failed (worker) pid=13472 log=evidence/logs/all-statuses-worker-failed.log
-2026-10-22T17:01:39.351Z job 83f51c0a-edbf-4891-bcec-79b36748bdd4 is failed, run_at=2026-10-22T17:11:39.296Z
-2026-10-22T17:01:39.351Z stopping worker-failed pid=13472
+2026-10-23T13:05:52.724Z started worker-failed (worker) pid=24316 log=evidence/logs/all-statuses-worker-failed.log
+2026-10-23T13:05:53.630Z job 2c0fd21b-1974-4a65-9cd6-a32c7d023c27 is failed, run_at=2026-10-23T13:15:53.520Z
+2026-10-23T13:05:53.630Z stopping worker-failed pid=24316
 
 phase 4: processing - a worker with a ten minute handler delay
-2026-10-22T17:01:39.391Z started worker-processing (worker) pid=26756 log=evidence/logs/all-statuses-worker-processing.log
-2026-10-22T17:01:40.019Z job f0fb6fee-e9f6-443c-8e7f-9bc976cea0d8 is processing
+2026-10-23T13:05:53.657Z started worker-processing (worker) pid=3760 log=evidence/logs/all-statuses-worker-processing.log
+2026-10-23T13:05:54.589Z job 008029e9-8e5c-4b3e-a8b4-68dfa4186bb8 is processing
 
 phase 5: pending - run_at one hour in the future
-2026-10-22T17:01:40.028Z job 49892183-459f-42e7-b9b1-f68aed4134d1 is pending, run_at one hour in the future
+2026-10-23T13:05:54.603Z job fe44cce6-f78b-46e9-9d35-32ef77e9d058 is pending, run_at one hour in the future
 
 counts per status in the jobs table:
   status      count
@@ -37,13 +37,13 @@ counts per status in the jobs table:
 the five jobs:
   status      job id                                note                                     
   ----------  ------------------------------------  -----------------------------------------
-  succeeded   8b8f713b-8edd-4208-9b93-017e8b0ed5a0  first of three                           
-  dead        38a33ce1-461f-473a-97ee-f796b77f7ec5  max_attempts=1, FAIL_RATE=1              
-  failed      83f51c0a-edbf-4891-bcec-79b36748bdd4  BACKOFF_BASE_MS=600000                   
-  processing  f0fb6fee-e9f6-443c-8e7f-9bc976cea0d8  WORK_DELAY_MS=600000, worker left running
-  pending     49892183-459f-42e7-b9b1-f68aed4134d1  run_at = now() + 1 hour                  
+  succeeded   1765eafa-260b-4f1c-8f64-2b670a408a33  first of three                           
+  dead        226d4ad8-87e5-44a6-ac06-744bf95762a0  max_attempts=1, FAIL_RATE=1              
+  failed      2c0fd21b-1974-4a65-9cd6-a32c7d023c27  BACKOFF_BASE_MS=600000                   
+  processing  008029e9-8e5c-4b3e-a8b4-68dfa4186bb8  WORK_DELAY_MS=600000, worker left running
+  pending     fe44cce6-f78b-46e9-9d35-32ef77e9d058  run_at = now() + 1 hour                  
 PENDING JOB (inserted with a future run_at)
-  jobs     id=49892183-459f-42e7-b9b1-f68aed4134d1 status=pending attempts=0/5 run_at=2026-10-22T18:01:40.023Z started_at=null finished_at=null last_error=null
+  jobs     id=fe44cce6-f78b-46e9-9d35-32ef77e9d058 status=pending attempts=0/5 run_at=2026-10-23T14:05:54.597Z started_at=null finished_at=null last_error=null
   job_runs (none)
   reports  count=0
   PASS: all five statuses exist at the same time
@@ -51,5 +51,5 @@ PENDING JOB (inserted with a future run_at)
 the API is still up: http://127.0.0.1:3000/jobs
 dead letter page (should be empty apart from the dead job above): http://127.0.0.1:3000/dead
 stopping the processing worker and the API
-2026-10-22T17:01:40.261Z stopping worker-processing pid=26756
-2026-10-22T17:01:40.283Z stopping api pid=23744
+2026-10-23T13:05:57.890Z stopping worker-processing pid=3760
+2026-10-23T13:05:57.903Z stopping api pid=27632

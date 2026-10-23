@@ -4,6 +4,7 @@ import {
   Evidence,
   PORT,
   REPORT_PAYLOAD,
+  SCREENSHOTS,
   check,
   cleanSlate,
   pauseForScreenshot,
@@ -260,10 +261,20 @@ await withChildren(evidence, async (track) => {
   evidence.log('');
   evidence.log(`the API is still up: http://127.0.0.1:${PORT}/jobs`);
   evidence.log(`dead letter page (should be empty apart from the dead job above): http://127.0.0.1:${PORT}/dead`);
-  await pauseForScreenshot(
-    evidence,
-    `/jobs with all five statuses - http://127.0.0.1:${PORT}/jobs`,
-  );
+  await pauseForScreenshot(evidence, {
+    what: `/jobs with all five statuses - http://127.0.0.1:${PORT}/jobs`,
+    url: `http://127.0.0.1:${PORT}/jobs`,
+    file: 'all-statuses.png',
+  });
+  // The dead letter page is captured only in --screenshots mode: the manual
+  // --pause flow keeps its single prompt.
+  if (SCREENSHOTS) {
+    await pauseForScreenshot(evidence, {
+      what: `/dead with the dead job's payload, full error and run history - http://127.0.0.1:${PORT}/dead`,
+      url: `http://127.0.0.1:${PORT}/dead`,
+      file: 'dead-letter.png',
+    });
+  }
 
   await sleep(200);
   evidence.log('stopping the processing worker and the API');

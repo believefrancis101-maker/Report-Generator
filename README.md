@@ -998,6 +998,9 @@ timestamped child logs to `evidence/logs/`.
 
 Add `--pause` to a script to stop at each screenshot point; it prints
 `SCREENSHOT NOW: <what to capture>` and keeps the API up until Enter is pressed.
+Add `--screenshots` instead to capture the same pages automatically with
+Playwright (Chromium) and continue; `npm run evidence:screenshots` runs both
+scripts that produce captures and lists every file with its size.
 `evidence/README.md` maps every output file (and screenshot) to the behaviour it
 demonstrates.
 
@@ -1005,7 +1008,7 @@ demonstrates.
 | --- | --- | --- |
 | Enqueue does not do the work | `npm run evidence:concurrency` | 50 simultaneous POSTs: 50 × `202`, wall 197.4 ms (min 147.2, mean 164.7, max 182.6 ms). All 50 processed with `CONCURRENCY=3`; the worker log never exceeds `concurrent=3` (`concurrent=1: 30, concurrent=2: 34, concurrent=3: 36`). |
 | Backoff and jitter | `npm run evidence:backoff` | 5 attempts. Gaps between starts 3,174 / 4,239 / 8,999 / 18,876 ms for nominal 2,000 / 4,000 / 8,000 / 16,000 ms; every gap inside `[nominal, 1.5 × nominal + poll slack]`. Final line: `status=dead`. |
-| Kill mid-job, recover | `npm run evidence:kill-recovery` | `SIGKILL` at `16:58:50.006Z`; the job stayed `processing` with one open run; the sweep recovered it at 8,653 ms of age (`attempts=1`), runs show `crashed` → `succeeded`, exactly one `reports` row. |
+| Kill mid-job, recover | `npm run evidence:kill-recovery` | `SIGKILL` at `13:05:42.035Z`; the job stayed `processing` with one open run; the sweep recovered it at 8,574 ms of age (`attempts=1`), runs show `crashed` → `succeeded`, exactly one `reports` row. |
 | Idempotency key | `npm run evidence:idempotency-key` | First submit `202`, repeat `200 {"duplicate":true}` with the same id. 20 concurrent submits of another key: 1 × `202` + 19 × `200`, one distinct id, `count(*) = 1` per key. Same key with a different payload: `422`. |
 | Two workers, one queue | `npm run evidence:two-workers` | 100 jobs → 100 runs over 100 distinct jobs, 0 jobs with more than one run. worker-a 51 runs, worker-b 49, both peaked at `concurrent=3`. |
 | Crash after the work | `npm run evidence:crash-after-work` | Worker exited with code 1 after saving the report; the job was still `processing` with the run open. Recovery logged `report ... already exists, skipping`; final `attempts=1`, one `reports` row, and the aggregation log line appears once across both workers. |
@@ -1021,7 +1024,7 @@ histogram: concurrent=1: 30, concurrent=2: 34, concurrent=3: 36
 attempt 2: gap=3174ms in [2000, 4500]  PASS  (previous attempt logged retry in 2923ms, jitter=923ms, at most 1000ms)
 attempt 5: gap=18876ms in [16000, 25500]  PASS  (previous attempt logged retry in 18715ms, jitter=2715ms, at most 8000ms)
 
-2026-10-22T16:58:59.281Z [worker evidence-kill-b] sweep recovered 96229105-7bd6-435d-9c13-75376ed28295 -> pending (attempts=1)
+2026-10-23T13:05:47.037Z [worker evidence-kill-b] sweep recovered e1065e41-ae99-4a49-bc01-e50a292ed4a6 -> pending (attempts=1)
 ```
 
 The values above are copied from the transcripts, not written by hand. Each
@@ -1043,16 +1046,19 @@ run; `evidence/README.md` has the run instructions and the pause points.
 
 ### Screenshots
 
-The screenshots are not committed yet; the filenames are placeholders. Run the
-script with `--pause`, wait for `SCREENSHOT NOW`, and capture the page while the
-script waits.
+The screenshots were captured by script from the real pages during the runs:
+`npm run evidence:screenshots` runs `kill-recovery` and `all-statuses` with
+`--screenshots`, and each point is captured with Playwright (Chromium) at a
+1400x900 viewport, 2x scale, full page, after the network is idle and the table
+has rendered.
 
-| Screenshot (placeholder) | Run | What it shows |
-| --- | --- | --- |
-| `evidence/screenshots/jobs-processing.png` | `npm run evidence:kill-recovery -- --pause` (first pause) | `/jobs` with the job `processing` and one open run. |
-| `evidence/screenshots/jobs-after-kill.png` | same run (second pause) | `/jobs` after `SIGKILL`: still `processing`, still one open run, nothing swept yet. |
-| `evidence/screenshots/jobs-recovered.png` | same run (third pause) | `/jobs` after recovery: `succeeded`; `/dead` still empty. |
-| `evidence/screenshots/jobs-all-statuses.png` | `npm run evidence:all-statuses -- --pause` | `/jobs` showing all five statuses in the counts and the table. |
+| Screenshot | What it shows |
+| --- | --- |
+| ![Jobs while the job is processing](evidence/screenshots/kill-1-before.png) | `/jobs` with the job `processing` (blue badge) and one open run, before the kill. |
+| ![Jobs after the kill](evidence/screenshots/kill-2-after-kill.png) | `/jobs` after `SIGKILL`: still `processing`, still one open run, nothing swept yet. |
+| ![Jobs after recovery](evidence/screenshots/kill-3-after-recovery.png) | `/jobs` after recovery: `succeeded`, `Failed attempts 1/5`, and the sweep message in `last_error`. |
+| ![All five statuses](evidence/screenshots/all-statuses.png) | `/jobs` with all five statuses in the counts and in the table. |
+| ![Dead letter](evidence/screenshots/dead-letter.png) | `/dead` with the dead job's payload, full error and run history. |
 
 ## Status
 

@@ -26,6 +26,12 @@ export const LOG_DIR = join(EVIDENCE_DIR, 'logs');
 /** `--pause` is forwarded by npm: `npm run evidence:kill-recovery -- --pause`. */
 export const PAUSE = process.argv.includes('--pause');
 
+/**
+ * `--screenshots` replaces the interactive pause with a Playwright capture of
+ * the page under test.
+ */
+export const SCREENSHOTS = process.argv.includes('--screenshots');
+
 /** The API port; override with EVIDENCE_PORT when 3000 is taken. */
 export const PORT = Number(process.env.EVIDENCE_PORT ?? 3000);
 
@@ -271,14 +277,62 @@ export function waitForLogLine(
   );
 }
 
-/** Opens a browser-free pause so a screenshot can be taken. */
+/** Where the Playwright captures are written. */
+export const SCREENSHOT_DIR = join(EVIDENCE_DIR, 'screenshots');
+
+/** One screenshot point in a script. */
+export interface ScreenshotPoint {
+  /** What to capture, shown by the `--pause` prompt. */
+  what: string;
+  /** The page to open. */
+  url: string;
+  /** File name inside `evidence/screenshots/`. */
+  file: string;
+}
+
+/**
+ * Captures one page exactly as an operator would see it: 1400x900 viewport at
+ * 2x scale, full page, after the network is idle and the table has rendered.
+ */
+async function captureScreenshot(point: ScreenshotPoint): Promise<string> {
+  mkdirSync(SCREENSHOT_DIR, { recursive: true });
+  const { chromium } = await import('playwright');
+  const browser = await chromium.launch();
+  try {
+    const context = await browser.newContext({
+      viewport: { width: 1400, height: 900 },
+      deviceScaleFactor: 2,
+    });
+    const page = await context.newPage();
+    await page.goto(point.url, { waitUntil: 'networkidle' });
+    // The page shell is not enough: the jobs table must be rendered.
+    await page.waitForSelector('.table-wrap table', { state: 'visible' });
+    const path = join(SCREENSHOT_DIR, point.file);
+    await page.screenshot({ path, fullPage: true });
+    return path;
+  } finally {
+    await browser.close();
+  }
+}
+
+/**
+ * A screenshot point.
+ *
+ * - `--screenshots`: capture the page with Playwright and continue.
+ * - `--pause`: print `SCREENSHOT NOW` and wait for Enter (the manual path).
+ * - neither: do nothing, so the scripts stay non-interactive.
+ */
 export async function pauseForScreenshot(
   evidence: Evidence,
-  what: string,
+  point: ScreenshotPoint,
 ): Promise<void> {
+  if (SCREENSHOTS) {
+    await captureScreenshot(point);
+    return;
+  }
   if (!PAUSE) return;
   evidence.log('');
-  evidence.log(`SCREENSHOT NOW: ${what}`);
+  evidence.log(`SCREENSHOT NOW: ${point.what}`);
   evidence.log('Press Enter to continue...');
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   await new Promise<void>((resolveQuestion) => rl.question('', () => resolveQuestion()));

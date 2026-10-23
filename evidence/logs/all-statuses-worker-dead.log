@@ -1,4 +1,4 @@
-2026-10-22T17:01:38.589Z 2026-10-22T17:01:38.589Z [worker evidence-status-dead] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
-2026-10-22T17:01:38.623Z 2026-10-22T17:01:38.624Z [worker evidence-status-dead] claimed 38a33ce1-461f-473a-97ee-f796b77f7ec5 | concurrent=1
-2026-10-22T17:01:38.630Z 2026-10-22T17:01:38.630Z [worker evidence-status-dead] job 38a33ce1-461f-473a-97ee-f796b77f7ec5 is DEAD after 1 attempts: Injected failure (FAIL_RATE=1)
-2026-10-22T17:01:38.699Z [exit] code=null signal=SIGTERM
+2026-10-23T13:05:52.424Z 2026-10-23T13:05:52.429Z [worker evidence-status-dead] started | concurrency=1 pollIntervalMs=100 stuckTimeoutMs=60000 sweepIntervalMs=15000
+2026-10-23T13:05:52.521Z 2026-10-23T13:05:52.527Z [worker evidence-status-dead] claimed 226d4ad8-87e5-44a6-ac06-744bf95762a0 | concurrent=1
+2026-10-23T13:05:52.595Z 2026-10-23T13:05:52.601Z [worker evidence-status-dead] job 226d4ad8-87e5-44a6-ac06-744bf95762a0 is DEAD after 1 attempts: Injected failure (FAIL_RATE=1)
+2026-10-23T13:05:52.706Z [exit] code=null signal=SIGTERM
